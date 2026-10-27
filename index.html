@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="An offline Year 10 science interactive exploring radiant heat absorption in black, grey and white model cars, using virtual trials and 2026 class results.">
+  <title>Heat Lab | The Effect of Car Colour on Heat Absorption</title>
+  <style>
+    :root {
+      --ink:#16213d; --muted:#63718a; --accent:#6653f2; --accent-dark:#5140d4;
+      --wash:#f3f5fb; --line:#e3e8f2; --white:#fff;
+      --graph-black:#28334d; --graph-grey:#8792ab; --graph-white:#069caa;
+      --shadow:0 12px 35px rgba(27,39,82,.065);
+    }
+    *{box-sizing:border-box}
+    [hidden]{display:none!important}
+    body{margin:0;color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#f5f4fc 0,#f4f7fb 300px,#f7f9fc 100%);line-height:1.45}
+    button,select,input{font:inherit}
+    button{cursor:pointer}
+    button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #9a8eff;outline-offset:3px}
+    .shell{max-width:1420px;padding:27px clamp(15px,3vw,45px) 45px;margin:auto}
+    .eyebrow{letter-spacing:.145em;font-weight:800;text-transform:uppercase;font-size:.68rem}
+    .hero{background:radial-gradient(circle at 72% 0,rgba(184,168,255,.33),transparent 37%),linear-gradient(119deg,#1a204b 0%,#393187 72%,#5e4dd4 100%);color:#fff;padding:27px 32px;border-radius:25px;position:relative;overflow:hidden;box-shadow:0 15px 35px rgba(53,47,133,.16)}
+    .hero:after{content:"";position:absolute;width:230px;height:230px;border:1px solid rgba(255,255,255,.15);border-radius:50%;right:52px;top:-115px;box-shadow:0 0 0 46px rgba(255,255,255,.033),0 0 0 92px rgba(255,255,255,.024);pointer-events:none}
+    .hero-top{display:flex;justify-content:space-between;gap:20px;align-items:center;position:relative;z-index:1}
+    .brand{display:flex;gap:13px;align-items:center}
+    .brand-symbol{width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:#fff2;backdrop-filter:blur(5px);font-size:24px}
+    .brand-name{font-size:1.22rem;font-weight:850;letter-spacing:-.04em}
+    .brand-sub{opacity:.7;font-size:.76rem}
+    .hero-badge{font-size:.73rem;font-weight:750;color:#e6e2ff;border:1px solid #ffffff50;padding:7px 12px;border-radius:30px;white-space:nowrap}
+    .hero h1{font-size:clamp(1.8rem,3.6vw,2.8rem);margin:25px 0 8px;line-height:1.09;letter-spacing:-.055em;position:relative;z-index:1}
+    .hero p{margin:0;max-width:730px;color:#e2e1fa;font-size:.96rem;position:relative;z-index:1}
+    .tabs{display:flex;gap:8px;align-items:center;margin:22px 0 18px;flex-wrap:wrap}
+    .mode-tab{border:1px solid var(--line);background:#fff;color:#59647c;border-radius:13px;padding:11px 17px;font-weight:800;box-shadow:0 3px 12px #27335908;transition:transform .2s,background .2s}
+    .mode-tab:hover{transform:translateY(-1px)}
+    .mode-tab.active{background:#352c89;color:#fff;border-color:#352c89;box-shadow:0 8px 18px #6653f22b}
+    .tab-aside{margin-left:auto;color:var(--muted);font-size:.8rem}
+    .layout{display:grid;grid-template-columns:minmax(0,1.13fr) minmax(0,.87fr);gap:18px;align-items:start}
+    .stack{display:grid;gap:18px;min-width:0}
+    .card{background:#fff;border:1px solid var(--line);border-radius:21px;box-shadow:var(--shadow);overflow:hidden;min-width:0}
+    .card-pad{padding:21px}
+    .section-head{display:flex;align-items:start;justify-content:space-between;gap:12px;margin-bottom:15px}
+    .section-head h2,.section-head h3{margin:0;letter-spacing:-.035em;font-size:1.12rem}
+    .subtext{font-size:.81rem;color:var(--muted);margin:4px 0 0}
+    .small-badge{background:#f0eefb;border-radius:30px;padding:5px 10px;color:#6050b3;font-size:.72rem;font-weight:750;white-space:nowrap}
+    .stage{background:radial-gradient(ellipse at 50% 14%,#373455 0,#202945 47%,#131b31 100%);color:#fff;position:relative;padding:21px 19px 16px;overflow:hidden}
+    .stage:before{content:"";position:absolute;left:0;right:0;top:0;height:76%;background:repeating-linear-gradient(0deg,transparent,transparent 52px,rgba(255,255,255,.017) 53px);pointer-events:none}
+    .stage-top{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:5;flex-wrap:wrap}
+    .stage-title{font-size:.88rem;font-weight:800}
+    .stage-title-group{display:grid;gap:5px}
+    .stage-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+    .stage-run-btn{background:#ffce78;color:#2e2948;border:0;border-radius:10px;padding:8px 13px;font-size:.77rem;font-weight:900;box-shadow:0 5px 17px #ffb94752;white-space:nowrap}
+    .stage-run-btn:hover{background:#ffe0a4}
+    .record-state{font-size:.66rem;letter-spacing:.08em;font-weight:850;color:#b8bfd7;display:flex;gap:7px;align-items:center;text-transform:uppercase}
+    .record-led{display:inline-block;width:8px;height:8px;border-radius:50%;background:#929bb3;box-shadow:0 0 0 3px #ffffff16}
+    .stage.running .record-state{color:#a8ffcf}
+    .stage.running .record-led{background:#48efa1;box-shadow:0 0 0 4px #48efa122,0 0 12px #6bffc9;animation:recordPulse .7s ease-in-out infinite alternate}
+    .stage.completed .record-state{color:#d1e9ff}
+    .stage.completed .record-led{background:#76bbff}
+    @keyframes recordPulse{from{transform:scale(.8)}to{transform:scale(1.25)}}
+    .clock{font-size:.78rem;font-variant-numeric:tabular-nums;letter-spacing:.04em;color:#e7e6ff;border:1px solid #ffffff2d;background:#ffffff14;border-radius:9px;padding:6px 10px;white-space:nowrap}
+    .station-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;position:relative;padding:10px 0 8px}
+    .station{display:flex;align-items:center;flex-direction:column;position:relative;min-width:0}
+    .lamp{height:105px;width:100%;position:relative;display:flex;align-items:center;flex-direction:column;z-index:1}
+    .lamp-cord{width:3px;height:25px;background:#a2a7cc}
+    .lamp-neck{height:11px;width:27px;background:linear-gradient(90deg,#6c7893,#aeb9ce,#606e8d);border-radius:5px 5px 0 0}
+    .lamp-shade{width:83px;height:37px;background:linear-gradient(130deg,#f4edf0,#aeb9d2 57%,#59637d);clip-path:polygon(30% 0,70% 0,100% 92%,93% 100%,7% 100%,0 92%);position:relative}
+    .lamp-shade:after{content:"";position:absolute;bottom:0;left:7%;width:86%;height:5px;background:#ece7de;border-radius:50%}
+    .lamp-light{width:61px;height:65px;background:linear-gradient(180deg,rgba(255,217,119,.37),rgba(255,211,114,0));clip-path:polygon(39% 0,61% 0,100% 100%,0 100%);filter:blur(4px);position:absolute;top:65px}
+    .ray{height:74px;width:2px;border-radius:20px;position:absolute;top:66px;background:linear-gradient(180deg,rgba(255,207,106,.92),rgba(255,213,124,.12));transform-origin:top;animation:rayPulse 1.6s ease-in-out infinite alternate;box-shadow:0 0 9px #ffc76c75}
+    .ray.r1{transform:rotate(-23deg)}.ray.r2{transform:rotate(-11deg);animation-delay:.2s}.ray.r3{transform:rotate(10deg);animation-delay:.5s}.ray.r4{transform:rotate(23deg);animation-delay:.7s}
+    .stage:not(.running) .ray{animation-play-state:paused;opacity:.35}
+    @keyframes rayPulse{from{opacity:.4}to{opacity:.95}}
+    .bottle-assembly{margin-top:29px;height:165px;display:flex;align-items:center;flex-direction:column;position:relative;z-index:2}
+    .bottle-cap{width:37px;height:13px;border-radius:5px 5px 1px 1px;background:#e1e3e9;border:2px solid #8996ae}
+    .bottle-neck{width:31px;height:17px;border-radius:2px;background:linear-gradient(90deg,#d6e1f5,#ffffff9c,#9aa6c3);border-left:2px solid #9eabc5;border-right:2px solid #9eabc5}
+    .bottle-body{width:clamp(61px,7vw,99px);height:127px;position:relative;overflow:hidden;border-radius:20px 20px 15px 15px;border:3px solid #e8eeff77;box-shadow:inset -14px 1px 20px #00000022,0 13px 24px #0004}
+    .station[data-colour=black] .bottle-body{background:linear-gradient(100deg,#111723 1%,#2c354a 50%,#0f1624)}
+    .station[data-colour=grey] .bottle-body{background:linear-gradient(100deg,#8994a9 0,#c0c9d7 48%,#758197)}
+    .station[data-colour=white] .bottle-body{background:linear-gradient(100deg,#e8f2fa,#fff 45%,#c9d8e6);border-color:#effbff}
+    .bottle-body:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(255,116,45,var(--heat-opacity,.06)),rgba(255,189,68,var(--heat-opacity,.06)) 40%,transparent 87%);pointer-events:none;z-index:1}
+    .bottle-body:after{content:"";position:absolute;left:9%;top:8%;bottom:11%;width:14%;background:linear-gradient(90deg,#ffffff31,transparent);border-radius:15px}
+    .thermometer{position:absolute;right:17%;top:12px;bottom:15px;width:10px;background:#ffffff82;border:2px solid #efeff7;border-radius:20px;z-index:4;box-shadow:0 0 0 1px #51617a5c}
+    .fluid{position:absolute;bottom:1px;left:1px;right:1px;height:12%;background:linear-gradient(90deg,#f35a50,#fdb05f);border-radius:7px;transition:height .14s linear}
+    .thermometer:after{content:"";width:13px;height:13px;background:#f46550;border:2px solid #fff;border-radius:50%;position:absolute;bottom:-10px;left:-4px}
+    .air-dot{position:absolute;width:7px;height:7px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff2b8,#ff9a36 65%,#ed612e);box-shadow:0 0 12px #ffba6ad2;opacity:.75;z-index:2;animation:floatUp var(--heat-speed,1.7s) ease-in-out infinite alternate}
+    .air-dot:nth-child(4){left:32%;top:57%}.air-dot:nth-child(5){left:54%;top:31%;animation-delay:.5s}.air-dot:nth-child(6){left:27%;top:24%;animation-delay:1.2s}.air-dot:nth-child(7){left:49%;top:77%;animation-delay:1.7s}.air-dot:nth-child(8){left:68%;top:55%;animation-delay:.9s}
+    @keyframes floatUp{from{transform:translate(0,15px) scale(.75);opacity:.25}to{transform:translate(5px,-28px) scale(1.3);opacity:1}}
+    .stage:not(.running) .air-dot{animation-play-state:paused;opacity:.08!important}
+    .heat-flow{position:absolute;bottom:-28%;width:18px;height:68px;border-left:3px solid #ffb653b5;border-radius:50%;filter:drop-shadow(0 0 5px #ff852e);z-index:2;opacity:0;animation:flowUp var(--heat-speed,1.7s) linear infinite}
+    .heat-flow.f1{left:25%}.heat-flow.f2{left:47%;animation-delay:-.55s}.heat-flow.f3{left:66%;animation-delay:-1.1s}
+    .stage.running .heat-flow{opacity:.95}
+    .stage:not(.running) .heat-flow{animation-play-state:paused;opacity:0!important}
+    @keyframes flowUp{0%{transform:translateY(24px) rotate(-8deg) scale(.7);opacity:0}25%{opacity:.95}80%{opacity:.85}100%{transform:translateY(-103px) rotate(14deg) scale(1.2);opacity:0}}
+    .stage.running .bottle-body{box-shadow:inset -14px 1px 20px #00000022,0 13px 24px #0004,0 0 22px #ffb5564a}
+    .reflect{position:absolute;z-index:3;top:96px;left:50%;height:49px;width:3px;transform-origin:bottom;background:linear-gradient(0deg,#90dce7cc,#b7f1fb32);border-radius:4px;animation:reflectPulse 1.7s ease-in-out infinite alternate}
+    .reflect:before{content:"";position:absolute;top:-2px;left:-4px;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:9px solid #9de1ed}
+    .reflect.a{transform:rotate(-28deg)}.reflect.b{transform:rotate(26deg);animation-delay:.65s}
+    .station[data-colour=black] .reflect{opacity:.1}.station[data-colour=grey] .reflect{opacity:.35}.station[data-colour=white] .reflect{opacity:.75}
+    .stage:not(.running) .reflect{animation-play-state:paused}
+    @keyframes reflectPulse{from{filter:brightness(.7)}to{filter:brightness(1.3)}}
+    .workbench{position:absolute;left:5%;right:5%;height:13px;top:300px;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#62718b,#303d59);box-shadow:0 5px 13px #0008}
+    .station-readout{text-align:center;position:relative;z-index:2;width:100%;margin-top:12px}
+    .colour-label{font-size:.7rem;letter-spacing:.11em;font-weight:850;color:#d6def2}
+    .value{font-size:clamp(1.25rem,2.3vw,1.8rem);font-weight:850;letter-spacing:-.05em;font-variant-numeric:tabular-nums;line-height:1.25;white-space:nowrap}
+    .delta{font-size:.73rem;color:#9fe1d7;font-weight:780;font-variant-numeric:tabular-nums}
+    .stage-bottom{display:flex;gap:9px;align-items:center;justify-content:space-between;color:#c5c9dd;font-size:.74rem;position:relative;z-index:2;border-top:1px solid #ffffff22;margin-top:9px;padding-top:12px}
+    .stage-bottom strong{color:#f6f3ff}
+    .capture-status{display:flex;gap:12px;align-items:center;justify-content:space-between;color:#cdd5e9;font-size:.73rem;margin-top:12px;position:relative;z-index:2}
+    .capture-track{height:7px;background:#ffffff25;border-radius:20px;overflow:hidden;flex:1;max-width:190px}
+    .capture-fill{height:100%;width:0;background:linear-gradient(90deg,#77d9ff,#8df5b9);border-radius:20px;transition:width .12s linear}
+    .stage.completed .capture-fill{background:#99f6c4}
+    .diagram-key{display:flex;align-items:center;gap:6px;white-space:nowrap}
+    .key-line{width:17px;height:3px;border-radius:9px;background:#ffcc72}
+    .controls .section-head{margin-bottom:12px}
+    .help-copy{color:var(--muted);font-size:.81rem;margin:0 0 14px}
+    .action-row{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+    .btn{border:1px solid var(--line);border-radius:11px;padding:10px 13px;background:#fff;font-size:.83rem;font-weight:800;color:#38425c;transition:background .15s,transform .15s}
+    .btn:hover{background:#f2f1fd;transform:translateY(-1px)}
+    .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 6px 14px #6653f235}
+    .btn-primary:hover{background:var(--accent-dark)}
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    .speed-label{font-size:.75rem;color:var(--muted);font-weight:750;display:flex;align-items:center;gap:7px;margin-left:auto}
+    select{border:1px solid #dce2ee;background:#f9faff;border-radius:9px;padding:8px;color:#34405a;font-weight:700;min-width:0}
+    .lab-toggle{margin-top:15px;display:flex;align-items:center;gap:10px;padding-top:13px;border-top:1px solid var(--line);font-size:.82rem;color:#34405a;font-weight:780}
+    .lab-toggle input{accent-color:var(--accent);width:17px;height:17px;cursor:pointer}
+    .explore-settings{background:#f5f6fc;border:1px solid #e5e6f4;border-radius:12px;margin-top:11px;padding:13px;display:grid;grid-template-columns:1fr 1fr;gap:17px}
+    .setting-header{display:flex;justify-content:space-between;gap:7px;font-size:.76rem;font-weight:750;color:#55627b}
+    input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+    .hint{font-size:.74rem;color:#7a839b;margin:10px 0 0}
+    .warn{color:#8d5f21;background:#fff9e9;border:1px solid #f7e7bc;border-radius:9px;padding:9px 11px;margin-top:10px;font-size:.76rem}
+    .timeline{display:flex;align-items:center;gap:12px;margin-top:12px}
+    .timeline input{flex:1;min-width:0}
+    .timeline-markers{display:flex;justify-content:space-between;margin-left:94px;font-size:.69rem;color:#8792a6;font-variant-numeric:tabular-nums}
+    .group-line{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+    .group-line label{font-size:.77rem;font-weight:760;color:#68728c}
+    .group-line select{max-width:100%}
+    .group-chooser{display:flex;align-items:center;gap:7px}
+    .check-label{display:flex;gap:7px;align-items:center;cursor:pointer}
+    .check-label input{accent-color:var(--accent)}
+    .graph-wrap{position:relative;min-height:260px}
+    #graph{width:100%;height:auto;display:block;aspect-ratio:720/340}
+    .graph-actions{display:flex;gap:6px;margin-bottom:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .segment{display:flex;background:#f0f2f8;padding:3px;border-radius:9px}
+    .segment button{border:0;background:transparent;color:#65718a;padding:6px 11px;border-radius:7px;font-size:.75rem;font-weight:800}
+    .segment button.active{background:#fff;color:#33277c;box-shadow:0 2px 8px #1d2a4719}
+    .legend{display:flex;align-items:center;gap:13px;flex-wrap:wrap;font-size:.73rem;color:#6e7890;font-weight:740}
+    .legend span{display:flex;align-items:center;gap:5px}
+    .swatch{width:10px;height:10px;display:inline-block;border-radius:50%}
+    .swatch.black{background:var(--graph-black)}.swatch.grey{background:var(--graph-grey)}.swatch.white{background:var(--graph-white)}
+    .graph-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.74rem;color:#727e98;border-top:1px solid var(--line);padding-top:9px}
+    .reading-pill{font-weight:780;color:#485472}
+    .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+    .stat{background:#f7f9fd;border:1px solid #ebeff7;padding:12px;border-radius:11px;min-width:0}
+    .stat .name{font-size:.69rem;font-weight:850;letter-spacing:.07em;color:#79859a;text-transform:uppercase}
+    .stat .number{font-size:clamp(1.05rem,1.75vw,1.5rem);font-weight:850;letter-spacing:-.05em;font-variant-numeric:tabular-nums;margin:4px 0 0;white-space:nowrap}
+    .stat .sub{font-size:.69rem;color:#7f8ca2}
+    .table-scroll{overflow:auto;max-width:100%}
+    table{width:100%;border-collapse:collapse;font-size:.8rem;text-align:right;font-variant-numeric:tabular-nums}
+    th{font-size:.71rem;letter-spacing:.015em;color:#71809a;background:#f6f8fc;padding:10px 12px;font-weight:850;white-space:nowrap}
+    td{padding:10px 12px;border-bottom:1px solid #eef1f6;color:#34425e;font-weight:650;white-space:nowrap}
+    th:first-child,td:first-child{text-align:left}
+    tr:last-child td{border-bottom:0}
+    tr.highlight td{background:#f1f0ff;color:#4e42ba}
+    .capture-count{color:#d5cfff;background:#f3efff;border:1px solid #e4dcff;border-radius:9px;padding:8px 11px;font-weight:760;font-size:.75rem;margin:10px 0 0}
+    .table-top{display:flex;gap:10px;align-items:start;justify-content:space-between;margin-bottom:13px}
+    .table-note{font-size:.74rem;color:#7b869c;margin-top:10px}
+    .mini-title{font-size:.85rem;font-weight:850;margin:19px 0 8px}
+    .trial-summary{border-top:1px solid var(--line);margin-top:18px;padding-top:3px}
+    .trial-summary th,.trial-summary td{padding:7px;font-size:.73rem}
+    .inquiry{background:linear-gradient(120deg,#ffffff,#f8f7ff);padding:22px}
+    .question-list{margin:10px 0 0;padding-left:20px;color:#47536d;font-size:.84rem}
+    .question-list li{padding:4px 0}
+    details{border-top:1px solid var(--line);padding-top:12px;margin-top:13px;font-size:.81rem;color:#505e78}
+    summary{font-weight:830;color:#493da0;cursor:pointer}
+    details p{margin:9px 0 0}
+    .footnote{font-size:.73rem;color:#7c879e;margin:19px 2px 0;max-width:1100px}
+    .footnote strong{color:#59657a}
+    @media(max-width:1090px){.layout{grid-template-columns:1fr}.stage{min-height:437px}.bottle-body{width:clamp(75px,12vw,103px)}.tab-aside{display:none}}
+    @media(max-width:600px){.shell{padding:12px 10px 30px}.hero{padding:23px 19px;border-radius:18px}.hero-badge{display:none}.hero h1{margin-top:20px}.card{border-radius:16px}.card-pad,.inquiry{padding:16px}.stage{padding:15px 10px 13px;min-height:0}.stage-actions{width:100%;justify-content:space-between}.stage-run-btn{padding:7px 11px}.station-row{gap:0}.bottle-body{width:clamp(61px,18vw,90px)}.lamp-shade{width:67px}.value{font-size:1.3rem}.station-readout{margin-top:13px}.workbench{top:300px}.stage-bottom{font-size:.66rem}.stage-bottom .diagram-key{display:none}.capture-status{font-size:.66rem}.capture-track{max-width:90px}.explore-settings{grid-template-columns:1fr}.speed-label{margin-left:0}.stats{gap:5px}.stat{padding:9px}.stat .number{font-size:1.04rem}.tabs{margin:15px 0}.mode-tab{padding:10px 12px;font-size:.79rem}.timeline-markers{margin-left:90px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+    @media print{body{background:#fff}.hero{background:#28235b!important;print-color-adjust:exact}.controls,.tabs,.graph-actions .segment,.btn{display:none!important}.layout{display:block}.card{break-inside:avoid;box-shadow:none;margin:12px 0}.stage{print-color-adjust:exact}}
+  
+/* Part B: scoped styles preserve the original experiment. */
+.page-switch{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}.page-switch button{padding:14px 20px;border:2px solid #6653f2;border-radius:12px;background:white;color:#352c89;font-weight:800}.page-switch button[aria-current=page]{background:#352c89;color:white}.guide{max-width:1100px;margin:auto}.guide h2{font-size:1.5rem;letter-spacing:-.03em;margin:0 0 10px}.guide h3{margin:14px 0 8px}.guide p{line-height:1.65}.guide .intro{padding:30px;background:#eae6ff;border-radius:20px;margin-bottom:20px}.guide .g-section{padding:26px;margin:20px 0;border:1px solid #e0e6ef;background:white;border-radius:20px;box-shadow:var(--shadow);scroll-margin-top:20px}.guide .kicker{color:#6551b6;font-size:.8rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.guide .g-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.guide details{border:1px solid #dddfee;border-radius:12px;margin:10px 0;background:#fafaff;padding:14px}.guide summary{cursor:pointer;font-weight:750;color:#352c89}.guide details p:last-child{margin-bottom:0}.guide .answer{border-left:4px solid #6653f2;padding:10px 15px;background:#f3f1ff}.guide .g-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0}.guide select{max-width:100%;padding:8px;border:1px solid #b8bfd0;border-radius:8px;background:white}.guide button{min-height:42px}.guide .g-chart{width:100%;height:auto;display:block;min-width:420px}.guide .g-scroll{overflow:auto}.guide .g-diagram{width:100%;display:block;background:#f5f7fc;border-radius:14px}.guide .g-legend{display:flex;gap:18px;flex-wrap:wrap;font-weight:700;font-size:.9rem}.guide .g-legend span:before{content:'━';margin-right:6px;color:var(--series)}.guide table{font-size:.9rem}.guide th,.guide td{padding:10px}.guide .toc{display:flex;flex-wrap:wrap;gap:8px}.guide .toc a{color:#352c89;padding:8px 12px;background:white;border-radius:8px;font-weight:650}.guide .note{font-size:.87rem;color:#53617b}.guide .flow{stroke-dasharray:9 8;animation:gFlow 1s linear infinite}.guide .pulse{animation:gPulse 1.5s ease-in-out infinite alternate}.guide .still *{animation-play-state:paused!important}.guide .muted-part{opacity:.16}.guide input[type=range]{width:100%}.guide .heat-vessels{display:flex;justify-content:space-around;gap:10px;padding:20px 0;text-align:center}.guide .vessel{position:relative;width:88px;height:115px;margin:20px auto 12px;border:5px solid #8e9ab0;border-radius:15px;background:linear-gradient(to top,#ffc59a var(--fill,100%),#f5f8fc var(--fill,100%));display:grid;place-items:center;font-weight:800;color:#16213d}.guide .vessel:before{content:'↑ ↑ ↑';position:absolute;top:-30px;left:0;right:0;color:#ba4517;animation:gPulse 1s infinite alternate;opacity:var(--loss,1)}.guide .vessel.flask{border:9px double #6653f2}.guide .flow-label{font-size:15px;fill:#26324e}.guide .g-step[aria-pressed=true]{background:#352c89;color:white}.guide .g-footer{margin:25px 0}.guide .formula{font-size:1.15rem;font-weight:750}.guide .data-cards{display:flex;gap:12px;flex-wrap:wrap}.guide .data-cards p{flex:1;min-width:150px;background:#f3f5fb;padding:14px;border-radius:12px}.guide :focus-visible{outline:3px solid #8064e8;outline-offset:4px}
+@keyframes gFlow{to{stroke-dashoffset:-34}}@keyframes gPulse{from{opacity:.35;transform:translateY(2px)}to{opacity:1;transform:translateY(-3px)}}
+@media(max-width:650px){.guide .g-grid{grid-template-columns:1fr}.guide .g-section,.guide .intro{padding:18px}.page-switch button{flex:1}.guide .heat-vessels{font-size:.8rem}.guide .vessel{width:70px}.guide h2{font-size:1.3rem}}
+@media(prefers-reduced-motion:reduce){.guide *{animation:none!important}}
+/* Clear movement cues; styles scoped to the existing guide. */
+.guide .transfer-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}.guide .transfer-card{background:#f5f7fc;border-radius:16px;padding:16px;transition:opacity .2s}.guide .transfer-card h4{font-size:1.2rem;margin:0}.guide .transfer-card .mechanism{font-size:.78rem;letter-spacing:.1em;font-weight:800;color:#6551b6;margin:7px 0}.guide .transfer-card svg{width:100%;display:block}.guide .transfer-card svg text{font-size:15px;fill:#26324e;font-weight:650}.guide .transfer-card p{font-size:.94rem;margin:10px 0 0}.guide .muted-part{opacity:.4}.guide .visual-key{display:flex;flex-wrap:wrap;gap:12px 22px;font-size:.9rem;font-weight:700}.visual-key span:before{content:'●';font-size:1.1em;margin-right:7px}.warm-key:before{color:#bd4e22}.cool-key:before{color:#087b9c}.energy-key:before{color:#9a6900}.guide .pan-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(230px,1fr);gap:24px;align-items:center}.guide #gPanDiagram text{font-size:18px;fill:#26324e;font-weight:650}.guide #gPanDiagram #gTrackedWater text{fill:white}.guide .pan-steps{display:grid;gap:9px}.guide .pan-steps button{text-align:left;white-space:normal}.guide .pan-steps button[aria-pressed=true]{background:#352c89;color:white;border-color:#352c89}.guide .pan-coach h3{font-size:1.3rem}.guide .pan-coach>p{min-height:90px}.guide .loss-track{height:13px;border-radius:10px;background:#e7eaf2;margin:12px 0;width:140px;max-width:100%;overflow:hidden}.guide .loss-track div{height:100%;width:0;background:#b94a27;transition:width .1s linear}.guide #gLoss1{background:#23799b}.guide #gLoss2{background:#6653f2}.guide .vessel{background:rgb(255,210,155);transition:background .15s linear;width:105px;height:135px}.guide .vessel:before{content:'↑';font-size:30px;top:-40px;animation:gEnergyOut 1.8s linear infinite}.guide .vessel.flask:before{animation-duration:5s}.guide #gV1:before{animation-duration:2.8s}.guide .heat-vessels{padding-top:35px}.guide .g-chart{min-width:620px}.guide .flow{animation:none;stroke-dasharray:none}.guide #gShirtDiagram{margin-top:14px}
+@keyframes gEnergyOut{0%{transform:translateY(12px);opacity:0}30%{opacity:1}100%{transform:translateY(-18px);opacity:0}}
+@media(max-width:850px){.guide .transfer-grid{grid-template-columns:1fr}.guide .transfer-card{display:grid;grid-template-columns:1fr 1fr;column-gap:18px;align-items:center}.guide .transfer-card h4,.guide .transfer-card .mechanism{grid-column:2}.guide .transfer-card svg{grid-column:1;grid-row:1 / 4}.guide .transfer-card p:last-child{grid-column:2}.guide .pan-layout{grid-template-columns:1fr}.guide .pan-coach>p{min-height:0}.guide .pan-steps{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.guide .transfer-card{display:block}.guide .transfer-card svg{max-width:320px;margin:auto}.guide .pan-steps{grid-template-columns:1fr}.guide .vessel{width:70px;height:110px;font-size:.9rem}.guide .loss-track{width:85px}.guide .heat-vessels{gap:6px}.guide .heat-vessels>div{min-width:0;flex:1}.guide .heat-vessels strong{min-height:38px;display:block}.guide .pan-coach{padding:8px}}
+/* Part A keeps its existing model; make the air movement visible and show the return path. */
+.stage.running .air-dot{width:9px;height:9px;animation:labAirLoop 4s linear infinite!important;border:1px solid white;box-shadow:0 0 6px #ffba6a;left:22%!important;top:67%!important}.stage.running .air-dot:nth-child(5){animation-delay:-.8s!important}.stage.running .air-dot:nth-child(6){animation-delay:-1.6s!important}.stage.running .air-dot:nth-child(7){animation-delay:-2.4s!important}.stage.running .air-dot:nth-child(8){animation-delay:-3.2s!important}.stage.running .heat-flow{opacity:.3!important}.stage.running .air-dot{z-index:5}.bottle-body{--airAcross:28px}
+@keyframes labAirLoop{0%{transform:translate(0,0);background:#dc672e;opacity:1}35%{transform:translate(0,-65px);background:#dc672e;opacity:1}50%{transform:translate(var(--airAcross),-65px);background:#2585b6;opacity:1}85%{transform:translate(var(--airAcross),0);background:#2585b6;opacity:1}100%{transform:translate(0,0);background:#dc672e;opacity:1}}
+@media(prefers-reduced-motion:reduce){.guide .vessel:before,.stage.running .air-dot{animation:none!important}}
+
+</style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="hero-top">
+        <div class="brand">
+          <div class="brand-symbol" aria-hidden="true">☀</div>
+          <div><div class="brand-name">HEAT LAB</div><div class="brand-sub">Year 10 Science · Physics Investigation</div></div>
+        </div>
+        <div class="hero-badge">SELF-CONTAINED · WORKS OFFLINE</div>
+      </div>
+      <h1>Does car colour change how quickly it heats up?</h1>
+      <p>Investigate radiant energy with three coloured model cars, then compare your observations with authentic 2026 class measurements.</p>
+    </header>
+
+<nav class="page-switch" aria-label="Lab pages"><button id="pageOneBtn" aria-current="page" aria-controls="experimentPage">Page 1 · Experiment</button><button id="pageTwoBtn" aria-current="false" aria-controls="guidePage">Page 2 · Explanations &amp; solutions →</button></nav><div id="experimentPage">
+    <nav class="tabs" aria-label="Choose experiment mode">
+      <button class="mode-tab active" id="virtualTab" aria-current="page" type="button">✦ Virtual experiment</button>
+      <button class="mode-tab" id="classTab" type="button">▥ 2026 class results</button>
+      <span class="tab-aside" id="modeHint">Control the experiment · collect temperature readings</span>
+    </nav>
+
+    <div class="layout">
+      <div class="stack">
+        <section class="card" aria-label="Animated bottles and lamps">
+          <div class="stage" id="stage">
+            <div class="stage-top">
+              <div class="stage-title-group">
+                <div class="stage-title" id="stageTitle">Three model cars · identical heat sources</div>
+                <div class="record-state" role="status"><span class="record-led" aria-hidden="true"></span><span id="recordState">READY · PRESS START</span></div>
+              </div>
+              <div class="stage-actions">
+                <button class="stage-run-btn" id="stageRunBtn" type="button">▶ Start</button>
+                <div class="clock" id="clock" aria-live="off">00:00 / 15:00</div>
+              </div>
+            </div>
+            <div class="station-row">
+              <div class="workbench" aria-hidden="true"></div>
+              <div class="station" data-colour="black">
+                <div class="lamp" aria-hidden="true"><div class="lamp-cord"></div><div class="lamp-neck"></div><div class="lamp-shade"></div><div class="lamp-light"></div><span class="ray r1"></span><span class="ray r2"></span><span class="ray r3"></span><span class="ray r4"></span></div>
+                <span class="reflect a" aria-hidden="true"></span><span class="reflect b" aria-hidden="true"></span>
+                <div class="bottle-assembly" aria-hidden="true"><div class="bottle-cap"></div><div class="bottle-neck"></div><div class="bottle-body"><span class="heat-flow f1"></span><span class="heat-flow f2"></span><span class="heat-flow f3"></span><span class="air-dot"></span><span class="air-dot"></span><span class="air-dot"></span><span class="air-dot"></span><span class="air-dot"></span><div class="thermometer"><div class="fluid" id="fluid-black"></div></div></div></div>
+                <div class="station-readout"><div class="colour-label">BLACK</div><div class="value" id="t-black">20.0 °C</div><div class="delta" id="delta-black">+0.0 °C</div></div>
+              </div>
+              <div class="station" data-colour="grey">
+                <div class="lamp" aria-hidden="true"><div class="lamp-cord"></div><div class="lamp-neck"></div><div class="lamp-shade"></div><div class="lamp-light"></div><span class="ray r1"></span><span class="ray r2"></span><span class="ray r3"></span><span class="ray r4"></span></div>
+                <span class="reflect a" aria-hidden="true"></span><span class="reflect b" aria-hidden="true"></span>
+                <div class="bottle-assembly" aria-hidden="true"><div class="bottle-cap"></div><div class="bottle-neck"></div><div class="bottle-body"><span class="heat-flow f1"></span><span class="heat-flow f2"></span><span class="heat-flow f3"></span><span class="air-dot"></span><span class="air-dot"></span><span class="air-dot"></span><span class="air-dot"></span><span class="air-dot"></span><div class="thermometer"><div class="fluid" id="fluid-grey"></div></div></div></div>
+                <div class="station-readout"><div class="colour-label">GREY</div><div class="value" id="t-grey">20.0 °C</div><div class="delta" id="delta-grey">+0.0 °C</div></div>
+              </div>
+              <div class="station" data-colour="white">
+                <div class="lamp" aria-hidden="true"><div class="lamp-cord"></div><div class="lamp-neck"></div><div class="lamp-shade"></div><div class="lamp-light"></div><span class="ray r1"></span><span class="ray r2"></span><span class="ray r3"></span><span class="ray r4"></span></div>
+                <span class="reflect a" aria-hidden="true"></span><span class="reflect b" aria-hidden="true"></span>
+                <div class="bottle-assembly" aria-hidden="true"><div class="bottle-cap"></div><div class="bottle-neck"></div><div class="bottle-body"><span class="heat-flow f1"></span><span class="heat-flow f2"></span><span class="heat-flow f3"></span><span class="air-dot"></span><span class="air-dot"></span><span class="air-dot"></span><span class="air-dot"></span><span class="air-dot"></span><div class="thermometer"><div class="fluid" id="fluid-white"></div></div></div></div>
+                <div class="station-readout"><div class="colour-label">WHITE</div><div class="value" id="t-white">20.0 °C</div><div class="delta" id="delta-white">+0.0 °C</div></div>
+              </div>
+            </div>
+            <div class="capture-status">
+              <span id="captureStatus" aria-live="polite">Waiting to record the 0-minute reading</span>
+              <div class="capture-track" aria-hidden="true"><div class="capture-fill" id="captureFill"></div></div>
+            </div>
+            <div class="stage-bottom">
+              <span id="conditionsText"><strong>Controlled:</strong> lamp distance 10 cm · same power</span>
+              <span class="diagram-key"><span class="key-line"></span> gold: incoming · cyan: reflected · air: orange ↑, blue ↓</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="card card-pad controls" id="virtualControls" aria-labelledby="controlTitle">
+          <div class="section-head">
+            <div><h2 id="controlTitle">Run the investigation</h2><p class="subtext">Record every 3 minutes, up to 15 minutes.</p></div>
+            <span class="small-badge" id="trialBadge">Trial 1</span>
+          </div>
+          <p class="help-copy">All three bottles start at the same air temperature. Change only the surface colour in the fair-test setup.</p>
+          <div class="action-row">
+            <button class="btn btn-primary" id="runBtn" type="button">▶ Start experiment</button>
+            <button class="btn" id="stepBtn" type="button">+3 min · record</button>
+            <button class="btn" id="newTrialBtn" type="button">↻ Repeat trial</button>
+            <button class="btn" id="resetBtn" type="button">Reset all</button>
+            <label class="speed-label" for="speed">Playback speed
+              <select id="speed" aria-label="Simulation speed"><option value="1">1×</option><option value="2" selected>2×</option><option value="4">4×</option><option value="10">10×</option><option value="20">20×</option></select>
+            </label>
+          </div>
+          <label class="lab-toggle"><input type="checkbox" id="exploreToggle"> Explore beyond the fair test</label>
+          <div class="explore-settings" id="exploreSettings" hidden>
+            <div>
+              <label class="setting-header" for="distance"><span>Lamp distance</span><output id="distanceValue">10 cm</output></label>
+              <input id="distance" type="range" min="5" max="25" step="1" value="10">
+            </div>
+            <div>
+              <label class="setting-header" for="power"><span>Lamp power</span><output id="powerValue">100%</output></label>
+              <input id="power" type="range" min="25" max="100" step="5" value="100">
+            </div>
+          </div>
+          <div class="warn" id="exploreWarning" hidden>Changing the lamp settings starts a new run. Keep those settings identical when comparing trials. This is an exploratory model, not a direct measurement.</div>
+          <p class="hint" id="trialHint" aria-live="polite">Tip: finish a full 15-minute run before selecting Repeat trial. Completed runs appear beneath the results table.</p>
+        </section>
+
+        <section class="card card-pad controls" id="classControls" hidden aria-labelledby="classTitle">
+          <div class="section-head">
+            <div><h2 id="classTitle">Explore your class measurements</h2><p class="subtext">Seven groups · one recorded run per colour, per group.</p></div>
+            <span class="small-badge">Actual data</span>
+          </div>
+          <div class="group-line">
+            <div class="group-chooser"><label for="groupSelect">View</label>
+              <select id="groupSelect">
+                <option value="average">Class mean (7 groups)</option>
+                <option value="0">Group 1</option><option value="1">Group 2</option>
+                <option value="2">Group 3</option><option value="3">Group 4</option>
+                <option value="4">Group 5</option><option value="5">Group 6</option>
+                <option value="6">Group 7</option>
+              </select>
+            </div>
+            <label class="check-label"><input type="checkbox" id="spreadToggle"> Show class range on graph</label>
+          </div>
+          <div class="timeline">
+            <button class="btn btn-primary" id="playClassBtn" type="button">▶ Replay</button>
+            <input id="timeSlider" type="range" min="0" max="15" step="0.25" value="15" aria-label="Time in minutes">
+          </div>
+          <div class="timeline-markers"><span>0 min</span><span>3</span><span>6</span><span>9</span><span>12</span><span>15 min</span></div>
+          <p class="hint">Group names are intentionally omitted. The class mean is calculated from the supplied readings at each time point.</p>
+        </section>
+
+        <section class="card inquiry" aria-labelledby="thinkingTitle">
+          <div class="section-head"><div><h2 id="thinkingTitle">Think like a scientist</h2><p class="subtext">Use your practical results, graph and calculated rates.</p></div><span class="small-badge">Analyse</span></div>
+          <ol class="question-list">
+            <li>Which colour has the greatest <em>average rate of temperature change</em>? Support your answer with numbers and units.</li>
+            <li>Do all the temperature–time graphs have a constant gradient? What does their shape suggest?</li>
+            <li>How reliable are the class results? Use the variation among groups to justify your view.</li>
+            <li>Explain how radiation is absorbed or reflected and how thermal energy reaches the air inside each bottle.</li>
+          </ol>
+          <details><summary>Show the rate calculation method</summary><p id="workedExample">Average rate = (final temperature − initial temperature) ÷ total time, measured in °C/min.</p></details>
+          <details><summary>What might cause different groups to obtain different results?</summary><p>Consider lamp distance or output, initial temperature, the position of the thermometer bulb, slight changes in timing, bottle properties and how consistently readings were taken. Different groups provide useful comparisons, but are not automatically three repeat trials under identical conditions.</p></details>
+          <details><summary>What is the heat-transfer explanation?</summary><p>Radiation travels from the lamp to the bottles. Dark surfaces generally absorb more of the lamp's visible radiation and lighter surfaces reflect more. The warmed bottle transfers energy to the air by contact, with convection distributing that energy. Real absorption also depends on the material and wavelengths emitted by the lamp.</p></details>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="card card-pad" aria-labelledby="graphTitle">
+          <div class="section-head">
+            <div><h2 id="graphTitle">Temperature–time graph</h2><p class="subtext" id="graphSubtitle">Changes appear as the simulated experiment runs.</p></div>
+            <span class="small-badge">Live plot</span>
+          </div>
+          <div class="graph-actions">
+            <div class="segment" aria-label="Graph measurement">
+              <button type="button" id="absoluteBtn" class="active" aria-pressed="true">Temperature</button>
+              <button type="button" id="changeBtn" aria-pressed="false">Change (ΔT)</button>
+            </div>
+            <div class="legend" aria-label="Line key">
+              <span><i class="swatch black"></i>Black</span><span><i class="swatch grey"></i>Grey</span><span><i class="swatch white"></i>White</span>
+            </div>
+          </div>
+          <div class="graph-wrap"><svg id="graph" viewBox="0 0 720 340" role="img" aria-label="Line graph showing model-car air temperature against time, coloured by bottle."></svg></div>
+          <div class="graph-foot"><span id="axisDescription">Y-axis: air temperature (°C)</span><span class="reading-pill" id="graphReadout">t = 0 min</span></div>
+          <div class="stats" aria-label="Temperature changes and rates">
+            <div class="stat"><div class="name">Black</div><div class="number" id="rate-black">—</div><div class="sub" id="gain-black">ΔT +0.0 °C</div></div>
+            <div class="stat"><div class="name">Grey</div><div class="number" id="rate-grey">—</div><div class="sub" id="gain-grey">ΔT +0.0 °C</div></div>
+            <div class="stat"><div class="name">White</div><div class="number" id="rate-white">—</div><div class="sub" id="gain-white">ΔT +0.0 °C</div></div>
+          </div>
+          <p class="hint" id="rateNote">Rates are calculated as ΔT ÷ elapsed time, not an instantaneous gradient.</p>
+        </section>
+
+        <section class="card card-pad" aria-labelledby="dataTitle">
+          <div class="table-top">
+            <div><h2 id="dataTitle" style="font-size:1.12rem;margin:0">Results table</h2><p class="subtext" id="tableSubtitle">Temperatures are recorded every 3 minutes.</p></div>
+            <button class="btn" id="csvBtn" type="button" title="Download visible table as CSV">↓ CSV</button>
+          </div>
+          <div class="table-scroll">
+            <table aria-label="Temperature measurements by time and colour">
+              <thead><tr><th scope="col">Time (min)</th><th scope="col">Black (°C)</th><th scope="col">Grey (°C)</th><th scope="col">White (°C)</th></tr></thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+          </div>
+          <p class="capture-count" id="tableRecordingStatus" aria-live="polite">No virtual readings recorded yet. Press Start to capture 0 minutes.</p>
+          <p class="table-note" id="dataProvenance">Virtual readings are generated by an illustrative heating model; they are not recorded class observations.</p>
+          <div class="trial-summary" id="trialSummary" hidden>
+            <div class="mini-title">Completed virtual trials · temperature rise (°C)</div>
+            <div class="table-scroll"><table aria-label="Completed virtual trial summary">
+              <thead><tr><th scope="col">Trial</th><th scope="col">Black</th><th scope="col">Grey</th><th scope="col">White</th></tr></thead>
+              <tbody id="trialSummaryRows"></tbody>
+            </table></div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <p class="footnote"><strong>Scientific note:</strong> Moving dots represent small parcels of air circulating, not individual molecules. Their motion is slowed for visibility and does not set the measured heating rate.  This visualisation models coloured bottles with air thermometers under lamps, as in the Part A practical. The virtual mode illustrates trends using a simplified heating-and-cooling equation and small repeat-to-repeat variation; it is not a validated prediction for real cars. The 2026 results mode uses the supplied seven-group dataset exactly, including different starting temperatures. Calculated heating rates are recomputed from temperature readings over 15 minutes.</p>
+</div>
+<section id="guidePage" class="guide" hidden aria-labelledby="guideTitle">
+<div class="intro"><div class="kicker">Year 10 physics · Part B companion</div><h2 id="guideTitle" tabindex="-1">Follow the energy. Explain the evidence.</h2><p>Turn your investigation into a scientific explanation. Explore each diagram, try an answer, then reveal the reasoning. Your experiment is paused and its readings are kept while you visit this page.</p><button class="btn btn-primary" id="backExperiment">← Back to Experiment</button><p class="note">Based on the supplied 2026 Part A, class-data and Part B mark-scheme files. A revision guide: use your own wording and your own graph in the assessment.</p><nav class="toc" aria-label="Guide sections"><a href="#g-controls">1 · Fair tests</a><a href="#g-air">2 · Air model</a><a href="#g-graph">3 · Graphs</a><a href="#g-conclusion">4 · Explain & evaluate</a><a href="#g-cooling">5 · Heat loss</a><a href="#g-shirts">6 · Shirts</a><a href="#g-pan">7 · Convection</a></nav></div>
+<section class="g-section" id="g-controls"><div class="kicker">Question 1 · 2 marks</div><h2>Control a variable—and explain why</h2><p>A fair test changes <strong>bottle colour</strong> and measures the <strong>rate of air-temperature change</strong>. Choose a control to connect the method to the physics.</p><label for="gControl">Controlled variable</label> <select id="gControl"><option value="distance">Lamp distance · 10 cm</option><option value="volume">Bottle volume / amount of air</option><option value="material">Bottle material and wall thickness</option><option value="probe">Thermometer position</option><option value="duration">Exposure time and lamp output</option></select><div id="controlExplanation" class="answer" aria-live="polite"></div><details><summary>Reveal a full 2-mark model answer</summary><p>Keep every bottle 10 cm from an equivalent lamp. Changing the distance changes the radiant energy arriving per second, which could change the air’s heating rate independently of colour. Keeping distance constant makes the colour comparison fair.</p></details></section>
+<section class="g-section" id="g-air"><div class="kicker">Question 2 · 1 mark</div><h2>“Empty” bottles contain the thing we are modelling</h2><div class="g-grid"><div><p style="font-size:2rem;margin:8px 0">Bottle + air → Car + cabin air</p><p>The thermometer measures air inside a model car. The bottle wall represents the car’s outer surface.</p></div><details><summary>Why use air instead of water?</summary><p>Air models the air inside a car. Filling the same bottle with water would introduce a much larger thermal capacity and change its warming behaviour, so it would model a different system.</p><p class="note">A bottle cannot reproduce car glazing, ventilation, shape or interior materials. Limit your conclusion to the model and conditions tested.</p></details></div></section>
+<section class="g-section" id="g-graph"><div class="kicker">Question 3 · 8 marks</div><h2>Three colours. One clear comparison.</h2><p>Plot <strong>time (min)</strong> horizontally and <strong>temperature change, ΔT (°C)</strong> vertically. Subtract each colour’s own starting temperature. The original class groups did not all start at the same temperature.</p><div class="g-controls"><label for="gSource">Data</label><select id="gSource"><option value="mean">Class mean · 7 groups</option><option value="current">Current Page 1 readings</option></select><label for="gMetric">Vertical axis</label><select id="gMetric"><option value="change">Temperature change (°C)</option><option value="absolute">Air temperature (°C)</option></select><label><input type="checkbox" id="gFit" checked> Show straight best-fit lines</label></div><p id="gSourceNote" class="note"></p><div class="g-legend"><span style="--series:#28334d">Black · circles</span><span style="--series:#8792ab">Grey · squares</span><span style="--series:#069caa">White · triangles</span></div><div class="g-scroll"><svg class="g-chart" id="gHeatingGraph" viewBox="0 0 760 370" role="img" aria-label="Air temperature or temperature change against time for three bottle colours"></svg></div><p class="note">Symbols are measurements; dashed lines are least-squares straight fits to available readings. Fits are not forced through zero. A straight fit summarises the overall trend; heating can slow, so a smooth curve may better describe the pattern. Do not extrapolate these fits beyond the experiment.</p><div class="g-scroll"><table><caption>Recalculated results for the selected dataset</caption><thead><tr><th>Colour</th><th>Observed ΔT (°C)</th><th>Endpoint rate (°C/min)</th><th>Fit gradient (°C/min)</th></tr></thead><tbody id="gRates"></tbody></table></div><details><summary>Step 1 · Calculate temperature change and rate</summary><p class="formula">ΔT = T<sub>final</sub> − T<sub>initial</sub><br>Average rate = ΔT ÷ elapsed time</p><p id="gRateExample"></p><p>Use the actual elapsed interval for an unfinished run. The handwritten rates in the source class sheet contain some arithmetic inconsistencies; this guide recalculates rates from the temperatures.</p></details><details><summary>Step 2 · Use a best-fit line to support your conclusion</summary><p>Choose two widely spaced points <strong>on the fitted line</strong>, read their coordinates, then calculate (T₂ − T₁) ÷ (t₂ − t₁). These need not be measured points. The fit-gradient column reports that slope; it may differ from the measured endpoint rate.</p><p id="gFitExample"></p></details><details><summary>Step 3 · Check the graph against the mark scheme</summary><p>Label both axes with units; choose even scales using more than half the plotting area; plot all three series accurately; add suitable best-fit lines and clearly identify each colour. The question says “temperature change” although the rubric also refers to “temperature”: ΔT is the default here, and the alternative view shows absolute temperature explicitly.</p></details></section>
+<section class="g-section" id="g-conclusion"><div class="kicker">Question 4a · 6 marks</div><h2>Build a conclusion from four connected ideas</h2><div class="data-cards"><p><strong>Hypothesis</strong><br>Supported by this evidence?</p><p><strong>Trend</strong><br>Which warms fastest?</p><p><strong>Evidence</strong><br>Use graph gradients.</p><p><strong>Science</strong><br>Explain absorption.</p></div><details><summary>Reveal a worked conclusion · class mean</summary><p id="gConclusionText"></p><p class="note">This example always uses the seven-group class mean. Adapt the claim to your own hypothesis, graph and uncertainty. “Supports” is more appropriate than “proves”.</p></details>
+<h3>4b · Trace energy through the model (3 marks)</h3><p>Follow the three stages from left to right, or select one stage to focus on it. On a phone, the stages stack from top to bottom.</p><div class="g-controls"><button class="btn g-step" data-transfer="all" aria-pressed="true">Whole journey</button><button class="btn g-step" data-transfer="radiation" aria-pressed="false">1 · Radiation</button><button class="btn g-step" data-transfer="conduction" aria-pressed="false">2 · Conduction</button><button class="btn g-step" data-transfer="convection" aria-pressed="false">3 · Convection</button><button class="btn" id="gMotion" aria-pressed="false">Pause diagram motion</button></div>
+<div id="gTransferDiagram" class="transfer-grid motion-scene">
+<article data-part="radiation" class="transfer-card"><h4>1. Across the gap</h4><p class="mechanism">RADIATION</p><svg viewBox="0 0 300 270" role="img" aria-label="Yellow energy markers travel from a lamp to a bottle surface"><defs><marker id="gArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="context-stroke"/></marker></defs><rect x="247" y="60" width="24" height="155" rx="6" fill="#37425a"/><circle cx="42" cy="137" r="29" fill="#ffd47e" stroke="#a66a09" stroke-width="2"/><text x="42" y="142" text-anchor="middle">Lamp</text><path id="rTravel" d="M80 137H233" stroke="#9a6900" stroke-width="3" fill="none" marker-end="url(#gArrow)"/><path d="M80 98H233 M80 176H233" stroke="#d5af59" stroke-width="2"/><g class="energy-dot" data-route="rTravel" data-offset="0"><circle r="9" fill="#ffd44e" stroke="#7e5100" stroke-width="2"/></g><g class="energy-dot" data-route="rTravel" data-offset=".33"><circle r="9" fill="#ffd44e" stroke="#7e5100" stroke-width="2"/></g><g class="energy-dot" data-route="rTravel" data-offset=".66"><circle r="9" fill="#ffd44e" stroke="#7e5100" stroke-width="2"/></g><text x="150" y="35" text-anchor="middle">ENERGY MOVES →</text><text x="246" y="240" text-anchor="middle">Surface</text></svg><p>Energy travels as electromagnetic waves. <strong>No air is needed in the gap.</strong></p></article>
+<article data-part="conduction" class="transfer-card"><h4>2. Through the wall</h4><p class="mechanism">CONDUCTION</p><svg id="gWall" viewBox="0 0 300 270" role="img" aria-label="Particles vibrate around fixed positions as energy transfers from the warmer outer wall toward the cooler inner wall"><rect x="20" y="65" width="260" height="150" rx="15" fill="#eef0f6" stroke="#8a96aa"/><text x="150" y="35" text-anchor="middle">ENERGY MOVES →</text><path d="M40 245H260" stroke="#bd4e22" stroke-width="3" marker-end="url(#gArrow)"/><text x="22" y="56">Warmer</text><text x="215" y="56">Cooler</text><g id="gLattice"></g></svg><p>Particles <strong>vibrate in place</strong> and transfer energy to neighbours. The wall does not flow across.</p></article>
+<article data-part="convection" class="transfer-card"><h4>3. Around the air</h4><p class="mechanism">CONVECTION</p><svg viewBox="0 0 300 270" role="img" aria-label="Air parcels rise beside the warmer wall and return downward on the cooler side"><rect x="35" y="50" width="230" height="190" rx="28" fill="#edf5fc" stroke="#60708b" stroke-width="6"/><path id="airCircuit" d="M85 210 L85 110 Q85 80 115 80 L185 80 Q215 80 215 110 L215 190 Q215 215 185 215 L115 215 Q85 215 85 210Z" fill="none" stroke="#c6cfdb" stroke-width="3"/><path d="M85 185V115" stroke="#bd4e22" stroke-width="4" marker-end="url(#gArrow)"/><path d="M215 110V185" stroke="#087b9c" stroke-width="4" marker-end="url(#gArrow)"/><g data-route="airCircuit" data-offset="0" data-thermal="true"><circle r="10" stroke="white" stroke-width="3"/></g><g data-route="airCircuit" data-offset=".33" data-thermal="true"><circle r="10" stroke="white" stroke-width="3"/></g><g data-route="airCircuit" data-offset=".66" data-thermal="true"><circle r="10" stroke="white" stroke-width="3"/></g><text x="150" y="29" text-anchor="middle">AIR MOVES IN A LOOP</text><text x="150" y="135" text-anchor="middle">Warm ↑</text><text x="150" y="160" text-anchor="middle">Cool ↓</text></svg><p>Warmer, less dense air <strong>rises</strong>. Cooler, denser air <strong>sinks</strong>. Follow a dot around the loop.</p></article></div><div class="g-controls"><label for="gMotionSpeed">Diagram speed</label><select id="gMotionSpeed"><option value=".5">Slow · follow a marker</option><option value="1" selected>Normal</option><option value="2">Fast</option></select><button class="btn" id="gTransferStep">Pause &amp; move one step →</button></div><p class="visual-key"><span class="warm-key">Orange = warmer fluid</span><span class="cool-key">Blue = cooler fluid</span><span class="energy-key">Yellow = radiation energy</span></p><p id="gTransferText" class="answer" aria-live="polite">Radiation carries energy from the lamp; conduction transfers it through the wall; convection redistributes it through the air.</p><p class="note">The moving yellow markers represent energy, not pieces of matter. Fluid dots track small parcels of air, not individual molecules. Wall vibrations are enlarged to make them visible. Air next to the wall first gains energy by conduction.</p>
+<div class="g-grid"><details><summary>4c · Why repeat? (1 mark)</summary><p>Repeats test whether the results are repeatable and help assess reliability. Compare the spread and calculate a mean to reduce the influence of random variation. Repeats do not remove a systematic error.</p><p>The Part A method requests three trials. The supplied class sheet records one run per group: comparing groups provides evidence about reproducibility, but is not three controlled repeats by each group.</p></details><details><summary>4d · Two method improvements (2 marks)</summary><p><strong>1.</strong> Check the radiant output at each bottle position using an appropriate radiation sensor, then equalise the lamps and distances. This reduces differences in energy input.</p><p><strong>2.</strong> Run the heating for longer under the same controlled conditions and continue recording at equal intervals. This tests whether the colour ranking persists as heating slows.</p><p>Other extensions: test more colours, or repeat the entire colour comparison at several distances. At each distance, keep it the same for all colours; do not mix changed distances within one fair comparison.</p></details></div></section>
+<section class="g-section" id="g-cooling"><div class="kicker">Question 5 · 6 marks · Separate investigation</div><h2>Which bottle keeps a drink warm?</h2><p>Each bottle starts with <strong>500 mL of water at 80 °C</strong> in the same room. This is a cooling investigation, separate from the coloured-bottle air experiment.</p><div class="g-controls"><button class="btn btn-primary" id="gCoolPlay">▶ Play heat loss</button><button class="btn" id="gCoolReset">Reset cooling</button><button class="btn" id="gCoolNext">Next reading · +15 min →</button><output id="gCoolTime">0 min</output></div><label for="gCoolSlider">Explore cooling time (0–60 min)</label><input id="gCoolSlider" type="range" min="0" max="60" step=".1" value="0"><div class="heat-vessels" id="gVessels"><div><strong>Plastic</strong><div class="vessel" id="gV0">80 °C</div><span id="gDrop0">Drop: 0 °C</span><div class="loss-track"><div id="gLoss0"></div></div></div><div><strong>Stainless steel</strong><div class="vessel" id="gV1">80 °C</div><span id="gDrop1">Drop: 0 °C</span><div class="loss-track"><div id="gLoss1"></div></div></div><div><strong>Insulated flask</strong><div class="vessel flask" id="gV2">80 °C</div><span id="gDrop2">Drop: 0 °C</span><div class="loss-track"><div id="gLoss2"></div></div></div></div><p class="note">Arrows indicate energy leaving. Bottle shading changes uniformly with temperature; the amount of water stays constant. The bars compare the water’s temperature drop on the same 0–30 °C scale. Between measurements, displayed temperatures are linearly interpolated; playback compresses 60 minutes into 12 seconds.</p><div class="g-legend"><span style="--series:#b94a27">Plastic · circles</span><span style="--series:#23799b">Steel · squares</span><span style="--series:#6653f2">Flask · triangles</span></div><div class="g-scroll"><svg id="gCoolGraph" class="g-chart" viewBox="0 0 760 370" role="img" aria-label="Water temperatures fall over 60 minutes: plastic 80 to 54, steel 80 to 64, insulated flask 80 to 76 degrees Celsius"></svg><table><caption>Part B measured water temperatures</caption><thead><tr><th>Time (min)</th><th>Plastic (°C)</th><th>Steel (°C)</th><th>Flask (°C)</th></tr></thead><tbody><tr><td>0</td><td>80</td><td>80</td><td>80</td></tr><tr><td>15</td><td>72</td><td>76</td><td>79</td></tr><tr><td>30</td><td>65</td><td>72</td><td>78</td></tr><tr><td>45</td><td>59</td><td>68</td><td>77</td></tr><tr><td>60</td><td>54</td><td>64</td><td>76</td></tr></tbody></table></div><details><summary>Reveal variables and safety · 4 marks</summary><p><strong>Independent:</strong> bottle type/construction. <strong>Dependent:</strong> change in water temperature over time (or cooling rate). <strong>Control:</strong> same volume and starting temperature of water, room conditions and, where possible, bottle shape and lid arrangement.</p><p><strong>Safety with a reason:</strong> use suitable heat-resistant gloves when handling hot bottles to reduce the risk of skin burns; wear eye protection to protect against splashes of hot water.</p></details><details><summary>Reveal the evidence-based comparison · 2 marks</summary><p>The insulated flask kept the water warmest: its temperature dropped only <strong>4 °C</strong> in 60 minutes, compared with <strong>16 °C</strong> for steel and <strong>26 °C</strong> for plastic. Mean cooling-rate magnitudes were 0.067, 0.267 and 0.433 °C/min respectively. Signed temperature-change rates are negative.</p><p>For equal masses of water, Q = mcΔT means the larger temperature drop corresponds to a greater decrease in the water’s thermal energy. The flask limits transfer through its insulating construction.</p><p class="note">This ranking applies to these tested bottles. Steel conducts heat well: these results do not show that steel itself is a better insulator than plastic. Wall thickness, lids and construction also affect cooling.</p></details></section>
+<section class="g-section" id="g-shirts"><div class="kicker">Question 6 · 3 marks</div><h2>Why can a black shirt feel hotter in sunshine?</h2><div class="g-controls"><button class="btn g-step" id="gBlackShirt" aria-pressed="true">Black shirt</button><button class="btn g-step" id="gWhiteShirt" aria-pressed="false">White shirt</button></div><button class="btn" id="gShirtPause" aria-pressed="false">Pause sunlight motion</button><svg id="gShirtDiagram" class="g-diagram motion-scene" viewBox="0 0 700 230" role="img" aria-label="Sunlight reaches a shirt by radiation; a black shirt generally absorbs more while a white shirt reflects more"><circle cx="85" cy="100" r="40" fill="#ffcf78"/><text x="67" y="105" class="flow-label">Sun</text><path id="shirtIncoming" d="M140 100H375" stroke="#be7b11" stroke-width="5" class="flow" marker-end="url(#gArrow)"/><path id="gShirt" d="M390 55L440 40Q460 68 480 40L530 55L565 100L530 125L515 105V200H405V105L390 125L355 100Z" fill="#28334d" stroke="#65718b" stroke-width="3"/><path id="gShirtReflect" d="M390 80L285 35" stroke="#087e9c" stroke-width="3" class="flow" marker-end="url(#gArrow)"/><g data-route="shirtIncoming" data-offset="0"><circle r="8" fill="#ffd44e" stroke="#7e5100" stroke-width="2"/></g><g data-route="shirtIncoming" data-offset=".5"><circle r="8" fill="#ffd44e" stroke="#7e5100" stroke-width="2"/></g><g id="gReflectedMarker" data-route="gShirtReflect" data-offset="0"><circle r="8" fill="#087e9c" stroke="white" stroke-width="2"/></g><text x="500" y="224" text-anchor="middle" id="gAbsorbLabel">More absorbed</text><text x="160" y="155" class="flow-label">Electromagnetic radiation</text></svg><p id="gShirtText" class="answer">Black fabric generally absorbs more incoming sunlight, increasing the energy available to warm the fabric and wearer.</p><details><summary>Reveal a complete explanation</summary><p>The Sun emits electromagnetic radiation, which can travel through the vacuum of space and be absorbed by clothing or skin. Under otherwise similar conditions, black clothing generally absorbs more sunlight and white clothing reflects more, so a black shirt can become warmer.</p><p class="note">Fabric, fit, airflow and sweating also matter. Visible colour alone does not determine how a material absorbs or emits every infrared wavelength.</p></details></section>
+<section class="g-section" id="g-pan"><div class="kicker">Question 7 · 4 marks</div><h2>A saucepan is a circulation system</h2><div class="g-controls"><button class="btn btn-primary" id="gPanToggle" aria-pressed="false">▶ Animate convection</button></div><div class="pan-layout"><svg id="gPanDiagram" class="g-diagram still motion-scene" viewBox="0 0 600 430" role="img" aria-label="Follow one parcel of water: warm at the bottom, rise above the heat source, cool at the top, sink at the side, return along the bottom"><path d="M65 60V350H535V60" fill="#e5f2fc" stroke="#64748b" stroke-width="10"/><path d="M535 100H585" stroke="#64748b" stroke-width="12"/><path d="M70 95Q100 85 130 95T190 95T250 95T310 95T370 95T430 95T490 95T530 95" stroke="#3391b3" fill="none" stroke-width="3"/><path id="panRight" d="M320 310 L320 155 Q320 125 355 125 L440 125 Q475 125 475 160 L475 275 Q475 310 440 310Z" fill="none" stroke="#b2c6d8" stroke-width="4"/><path id="panLeft" d="M280 310 L280 155 Q280 125 245 125 L160 125 Q125 125 125 160 L125 275 Q125 310 160 310Z" fill="none" stroke="#b2c6d8" stroke-width="4"/><path d="M320 270V190 M280 270V190" stroke="#bd4e22" stroke-width="5" marker-end="url(#gArrow)"/><path d="M475 180V255 M125 180V255" stroke="#087b9c" stroke-width="5" marker-end="url(#gArrow)"/><g data-route="panLeft" data-offset="0" data-thermal="true"><circle r="11" stroke="white" stroke-width="3"/></g><g data-route="panLeft" data-offset=".5" data-thermal="true"><circle r="11" stroke="white" stroke-width="3"/></g><g data-route="panRight" data-offset=".5" data-thermal="true"><circle r="11" stroke="white" stroke-width="3"/></g><g id="gTrackedWater" data-route="panRight" data-offset="0" data-thermal="true"><circle r="17" stroke="#26324e" stroke-width="3"/><text y="6" text-anchor="middle" fill="white" style="font-size:19px;font-weight:800">★</text></g><text x="300" y="35" text-anchor="middle">COOLER NEAR THE SURFACE</text><text x="200" y="220" text-anchor="middle">Warm ↑</text><text x="420" y="220" text-anchor="middle">Cool ↓</text><path d="M300 410V365" stroke="#bd4e22" stroke-width="9" marker-end="url(#gArrow)"/><text x="335" y="400">HEAT</text></svg><div class="pan-coach"><span class="kicker">Follow the ★ water parcel</span><h3 id="gPanStage">1 · Warm and rise</h3><p id="gPanExplain">Near the heated base, water expands. It becomes less dense than nearby water and rises.</p><div class="pan-steps"><button class="btn" data-pan-phase=".08">1 · Warm &amp; rise ↑</button><button class="btn" data-pan-phase=".36">2 · Move across the top →</button><button class="btn" data-pan-phase=".61">3 · Cool &amp; sink ↓</button><button class="btn" data-pan-phase=".88">4 · Return along the base ←</button></div><p class="note">Choose a step to freeze the starred parcel in that part of its journey.</p></div></div><div class="g-controls"><button class="btn" id="gPanStep">Pause &amp; move one step →</button><label for="gPanSpeed">Water motion</label><select id="gPanSpeed"><option value=".5">Slow</option><option value="1" selected>Normal</option><option value="2">Fast</option></select></div><p class="visual-key"><span class="warm-key">Orange = warmer water</span><span class="cool-key">Blue = cooler water</span></p><p class="note">Dots are tracked parcels of water, not bubbles. Their colour changes as they warm and cool. Real flow is less regular than these simplified convection loops.</p><details><summary>Step 1 · Which way do the arrows go? (1 mark)</summary><p>Show water rising directly above the heat source, moving outward near the surface, sinking at the cooler sides, then returning along the bottom. These closed paths are convection cells.</p></details><details><summary>Step 2 · Why does the water move? (3 marks)</summary><p>Water heated at the bottom expands and becomes <strong>less dense</strong> than the surrounding water, so buoyancy causes it to <strong>rise</strong>. Cooler water is <strong>denser and sinks</strong>, setting up circulation that transfers thermal energy.</p><p class="note">The supplied mark scheme contains a typo saying cooler water becomes “less dense and drops”; the correct statement is <strong>more dense and sinks</strong>. Convection can begin before boiling. Steam bubbles are a separate process and are not the convection current itself.</p></details></section>
+<div class="g-footer"><button class="btn btn-primary" id="backExperimentBottom">← Back to Experiment</button><p class="note">Source materials: 2026 Physics practical assessment Part A and Part B mark schemes, and Physics Investigation Part A Classs data. Original class readings retained; group names anonymised. Animations illustrate mechanisms and are not quantitative predictions.</p></div></section>
+
+  </main>
+  <script>
+    (function () {
+      "use strict";
+      var TIMES=[0,3,6,9,12,15], COLORS=["black","grey","white"];
+      var PEN={black:"#28334d",grey:"#8792ab",white:"#069caa"};
+      var COEFF={black:3.50,grey:2.64,white:1.56};
+      // Supplied 2026 Year 10 Part A readings. Each group conducted one run per colour.
+      // Group names are omitted from the student interface.
+      var GROUPS=[
+        {black:[21,31,45,55,60,64],white:[21,23,27,32,36,39],grey:[21,34,42,48,50,52]},
+        {black:[21,23,39,49,54,64],white:[21,24,26,30,35,37],grey:[21,26,38,46,51,52]},
+        {black:[19,29,41,49,54,59],white:[18,21,27,31,35,38],grey:[16,26,38,46,51,55]},
+        {black:[18,36,48,55,60,63],white:[18,24,31,37,41,45],grey:[21,30,40,46,51,55]},
+        {black:[21,31,44,51,57.5,61],white:[21.5,26,32,37,42,45],grey:[19,27,35,41,46,49]},
+        {black:[20,30,38,48,54,59],white:[20,22,24,27,29,32],grey:[21,28,34,42,47,52]},
+        {black:[21,32,48,58,65,71],white:[22,25,30,34,37,40],grey:[19,26,34,40,44,48]}
+      ];
+      function $(id){return document.getElementById(id);}
+      function mean(a){return a.reduce(function(s,n){return s+n;},0)/a.length;}
+      var CLASS_MEAN={};
+      COLORS.forEach(function(c){CLASS_MEAN[c]=TIMES.map(function(_,i){return mean(GROUPS.map(function(g){return g[c][i];}));});});
+      var state={mode:"virtual",metric:"absolute",running:false,simTime:0,classTime:15,trial:1,
+        speed:2,distance:10,power:100,explore:false,group:"average",spread:false,
+        recorded:null,completed:[],alreadyCommitted:false,lastSampleIndex:-1,raf:0,lastFrame:0,lastRender:0};
+      function round1(x){return Math.round(x*10)/10;}
+      function fixed1(x){return x.toFixed(1);}
+      function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+      function baseline(trial){return 20+(Math.sin(trial*2.12)*.3);}
+      function jitter(c,trial,time){var phase={black:1.1,grey:2.7,white:4.4}[c];
+        return .27*(1-Math.exp(-time/3))*Math.sin(time*1.4+trial*1.6+phase);
+      }
+      function simTemp(c,t,trial){
+        var factor=Math.pow(10/state.distance,1.45)*(state.power/100);
+        var runVariation=1+0.035*Math.sin(trial*1.8+({black:.2,grey:1.4,white:2.3}[c]));
+        var loss=.028, heating=COEFF[c]*factor*runVariation;
+        return baseline(trial)+(heating/loss)*(1-Math.exp(-loss*t))+jitter(c,trial,t);
+      }
+      function emptyReadings(){
+        var obj={};COLORS.forEach(function(c){obj[c]=[null,null,null,null,null,null];});return obj;
+      }
+      state.recorded=emptyReadings();
+      function beginRecording(){
+        if(state.recorded.black[0]!==null)return;
+        COLORS.forEach(function(c){state.recorded[c][0]=round1(simTemp(c,0,state.trial));});
+        state.lastSampleIndex=0;
+      }
+      function selectedClass(){return state.group==="average"?CLASS_MEAN:GROUPS[Number(state.group)];}
+      function interpolate(values,t){
+        if(t<=0)return values[0];if(t>=15)return values[5];
+        var a=Math.floor(t/3),p=(t-TIMES[a])/3;
+        return values[a]+(values[a+1]-values[a])*p;
+      }
+      function actualT(c,t){
+        return state.mode==="virtual"?simTemp(c,t,state.trial):interpolate(selectedClass()[c],t);
+      }
+      function currentTime(){return state.mode==="virtual"?state.simTime:state.classTime;}
+      function displayTime(mins){
+        var sec=Math.round(mins*60);return String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0");
+      }
+      function readTimePoints(){
+        if(state.mode==="class")return selectedClass();
+        return state.recorded;
+      }
+      function stop(){
+        state.running=false;cancelAnimationFrame(state.raf);state.raf=0;
+        $("stage").classList.remove("running");updateButtons();
+      }
+      function collectReadings(){
+        beginRecording();
+        for(var i=1;i<TIMES.length;i++){
+          if(state.simTime+1e-7>=TIMES[i]&&state.recorded.black[i]===null){
+            COLORS.forEach(function(c){state.recorded[c][i]=round1(simTemp(c,TIMES[i],state.trial));});
+            state.lastSampleIndex=i;
+          }
+        }
+        if(state.simTime>=15&&!state.alreadyCommitted){
+          state.completed.push({trial:state.trial,readings:JSON.parse(JSON.stringify(state.recorded)),distance:state.distance,power:state.power});
+          state.alreadyCommitted=true;
+          $("trialHint").textContent="Trial "+state.trial+" saved. Select Repeat trial to collect another set of readings and compare the temperature rises.";
+        }
+      }
+      function restartVirtual(clearHistory){
+        stop();state.simTime=0;state.alreadyCommitted=false;state.lastSampleIndex=-1;
+        if(clearHistory){state.trial=1;state.completed=[];}
+        state.recorded=emptyReadings();render();
+      }
+      function repeatVirtual(){
+        if(state.simTime<15){
+          $("trialHint").textContent="Finish the 15-minute run before repeating. Your current readings have not been saved.";
+          return;
+        }
+        state.trial++;restartVirtual(false);
+        $("trialHint").textContent="Trial "+state.trial+" is ready. The setup remains unchanged for a fair comparison.";
+      }
+      function startOrPause(){
+        if(state.running){stop();render();return;}
+        if(state.mode==="virtual"&&state.simTime>=15){state.trial++;restartVirtual(false);}
+        if(state.mode==="class"&&state.classTime>=15)state.classTime=0;
+        if(state.mode==="virtual"){
+          beginRecording();
+          $("trialHint").textContent="Recording is active: the 0-minute reading has been saved. New readings are captured automatically every 3 minutes.";
+        }
+        state.running=true;state.lastFrame=performance.now();state.lastRender=0;
+        $("stage").classList.add("running");render();
+        state.raf=requestAnimationFrame(tick);
+      }
+      function stepVirtual(){
+        if(state.mode!=="virtual"||state.simTime>=15||state.running)return;
+        beginRecording();
+        var next=TIMES.filter(function(t){return t>state.simTime+.000001;})[0];
+        state.simTime=next===undefined?15:next;
+        collectReadings();render();
+      }
+      function tick(now){
+        if(!state.running)return;
+        var elapsed=Math.min(.25,(now-state.lastFrame)/1000);
+        state.lastFrame=now;
+        var step=(elapsed*state.speed)/1.3;
+        if(state.mode==="virtual"){
+          state.simTime=Math.min(15,state.simTime+step);
+          collectReadings();
+        }else{
+          state.classTime=Math.min(15,state.classTime+step);
+        }
+        if(now-state.lastRender>70||currentTime()>=15){render();state.lastRender=now;}
+        if(currentTime()>=15){stop();render();}
+        else state.raf=requestAnimationFrame(tick);
+      }
+      function setMode(mode){
+        if(state.mode===mode)return;
+        stop();state.mode=mode;
+        $("virtualControls").hidden=mode!=="virtual";
+        $("classControls").hidden=mode!=="class";
+        $("virtualTab").classList.toggle("active",mode==="virtual");
+        $("classTab").classList.toggle("active",mode==="class");
+        $("virtualTab").setAttribute("aria-current",mode==="virtual"?"page":"false");
+        $("classTab").setAttribute("aria-current",mode==="class"?"page":"false");
+        $("modeHint").textContent=mode==="virtual"?"Control the experiment · collect temperature readings":"Explore real class data · compare groups and averages";
+        $("graphSubtitle").textContent=mode==="virtual"?"Changes appear as the simulated experiment runs.":"Measured data from seven 2026 student groups.";
+        $("tableSubtitle").textContent=mode==="virtual"?"Temperatures are recorded every 3 minutes.":"Actual recorded temperatures at each 3-minute interval.";
+        $("dataProvenance").textContent=mode==="virtual"?
+          "Virtual readings are generated by an illustrative heating model; they are not recorded class observations.":
+          "Measurements transcribed from the supplied 2026 Part A class data. Group identifiers are anonymised; averages are calculated from seven groups.";
+        $("stageTitle").textContent=mode==="virtual"?"Three model cars · identical heat sources":"Replay the recorded experiment";
+        render();
+      }
+      function updateButtons(){
+        $("runBtn").textContent=state.running?"❚❚ Pause":state.simTime>=15?"▶ Run another trial":state.simTime>0?"▶ Resume":"▶ Start experiment";
+        $("playClassBtn").textContent=state.running?"❚❚ Pause":state.classTime>=15?"▶ Replay":"▶ Continue";
+        $("stageRunBtn").textContent=state.mode==="class"?
+          (state.running?"❚❚ Pause":state.classTime>=15?"▶ Replay":"▶ Continue"):
+          (state.running?"❚❚ Pause":state.simTime>=15?"▶ Another trial":state.simTime>0?"▶ Resume":"▶ Start");
+        $("stepBtn").disabled=state.mode!=="virtual"||state.running||state.simTime>=15;
+        $("newTrialBtn").disabled=state.simTime<15;
+        $("trialBadge").textContent="Trial "+state.trial;
+        $("timeSlider").value=String(state.classTime);
+      }
+      function updateStage(){
+        var t=currentTime();
+        var isVirtual=state.mode==="virtual",captured=state.recorded.black.filter(function(v){return v!==null;}).length;
+        $("stage").classList.toggle("completed",isVirtual&&state.alreadyCommitted);
+        $("recordState").textContent=!isVirtual?"CLASS DATA · REPLAY":
+          state.alreadyCommitted?"COMPLETE · 6/6 READINGS":
+          state.running?"HEATING · RECORDING":
+          captured?"PAUSED · "+captured+"/6 RECORDED":"READY · PRESS START";
+        $("captureFill").style.width=(t/15*100).toFixed(1)+"%";
+        $("captureStatus").textContent=!isVirtual?"Class measurements · use Replay or drag the timeline":
+          state.alreadyCommitted?"All 6 measurements saved · Trial "+state.trial+" complete":
+          captured===0?"Waiting to record the 0-minute reading":
+          captured===6?"All readings captured":
+          captured+" of 6 readings recorded · next: "+TIMES[captured]+" min";
+        $("clock").textContent=displayTime(t)+" / 15:00";
+        $("conditionsText").innerHTML=state.mode==="virtual"?
+          "<strong>"+(state.explore?"Exploring:":"Controlled:")+"</strong> lamp distance "+state.distance+" cm · power "+state.power+"%":
+          "<strong>Recorded data:</strong> "+(state.group==="average"?"class mean of 7 groups":"Group "+(Number(state.group)+1));
+        COLORS.forEach(function(c){
+          var temp=actualT(c,t),start=actualT(c,0),gain=temp-start;
+          $("t-"+c).textContent=fixed1(temp)+" °C";
+          $("delta-"+c).textContent=(gain>=0?"+":"")+fixed1(gain)+" °C";
+          $("fluid-"+c).style.height=clamp(9+(temp-15)*.8,10,88)+"%";
+          var root=document.querySelector(".station[data-colour="+c+"] .bottle-body");
+          root.style.setProperty("--heat-opacity",String(clamp((temp-20)/85,0,.6)));
+          root.style.setProperty("--heat-speed",clamp(2.0-(temp-20)*.022,.7,2.0).toFixed(2)+"s");
+        });
+      }
+      function updateTable(){
+        var data=readTimePoints(),tbody=$("resultsBody"),html="";
+        var highlightIndex=state.mode==="class"?Math.round(currentTime()/3):state.lastSampleIndex;
+        TIMES.forEach(function(t,i){
+          html+="<tr"+(highlightIndex===i?" class=\"highlight\"":"")+"><td>"+t+"</td>";
+          COLORS.forEach(function(c){
+            var val=data[c][i];
+            html+="<td>"+(val===null?"—":fixed1(val))+"</td>";
+          });
+          html+="</tr>";
+        });
+        tbody.innerHTML=html;
+        var captured=state.recorded.black.filter(function(v){return v!==null;}).length;
+        $("tableRecordingStatus").textContent=state.mode==="class"?"Actual class measurements · six time points per group":
+          state.alreadyCommitted?"✓ Trial "+state.trial+" complete · all 6 time points recorded":
+          captured===0?"No virtual readings yet · press Start to record the initial temperature":
+          "● Recording log · "+captured+" of 6 time points captured (latest: "+TIMES[state.lastSampleIndex]+" min)";
+        var history=$("trialSummary");
+        history.hidden=state.mode!=="virtual"||!state.completed.length;
+        if(!history.hidden){
+          var summary="";
+          state.completed.forEach(function(run){
+            summary+="<tr><td>"+run.trial+(run.distance!==10||run.power!==100?" *":"")+"</td>";
+            COLORS.forEach(function(c){summary+="<td>"+fixed1(run.readings[c][5]-run.readings[c][0])+"</td>";});
+            summary+="</tr>";
+          });
+          var consistent=state.completed.every(function(r){
+            return r.distance===state.completed[0].distance&&r.power===state.completed[0].power;
+          });
+          if(state.completed.length>1&&consistent){
+            summary+="<tr style=\"background:#f0efff;font-weight:800\"><td>Mean</td>";
+            COLORS.forEach(function(c){
+              var rises=state.completed.map(function(run){return run.readings[c][5]-run.readings[c][0];});
+              summary+="<td>"+fixed1(mean(rises))+"</td>";
+            });
+            summary+="</tr>";
+          }else if(state.completed.length>1){
+            summary+="<tr><td colspan=\"4\" style=\"text-align:left;color:#997035\">Settings varied between trials; a pooled mean would not be a fair comparison.</td></tr>";
+          }
+          $("trialSummaryRows").innerHTML=summary;
+        }
+      }
+      function updateStats(){
+        var t=state.mode==="class"?15:state.simTime;
+        COLORS.forEach(function(c){
+          var start=actualT(c,0);
+          var end=state.mode==="class"?selectedClass()[c][5]:actualT(c,t);
+          var gain=end-start,rate=t>.05?gain/t:null;
+          $("rate-"+c).textContent=rate===null?"—":rate.toFixed(2);
+          $("gain-"+c).textContent="ΔT "+(gain>=0?"+":"")+fixed1(gain)+" °C";
+        });
+        $("rateNote").textContent=state.mode==="class"?
+          "Numbers above are average heating rates (°C/min) over the full 15 minutes: (T15 − T0) ÷ 15.":
+          "Numbers above are average heating rates (°C/min) over elapsed time. They update as the virtual experiment runs.";
+        var d=state.mode==="class"?selectedClass():null;
+        if(d){
+          var start=d.black[0],end=d.black[5],rate=(end-start)/15;
+          $("workedExample").textContent="For the selected "+(state.group==="average"?"class mean":"group")+", black: ("+fixed1(end)+" − "+fixed1(start)+") ÷ 15 = "+rate.toFixed(2)+" °C/min. The same method applies to grey and white.";
+        }else{
+          $("workedExample").textContent="Average heating rate = (final temperature − initial temperature) ÷ time. For example, a rise of 30 °C over 15 min gives 30 ÷ 15 = 2.00 °C/min.";
+        }
+      }
+      function svgEl(tag,attrs,parent){
+        var n=document.createElementNS("http://www.w3.org/2000/svg",tag);
+        Object.keys(attrs||{}).forEach(function(k){n.setAttribute(k,attrs[k]);});
+        if(parent)parent.appendChild(n);return n;
+      }
+      function pointsFor(c){
+        if(state.mode==="class")return TIMES.map(function(t,i){return {t:t,v:selectedClass()[c][i]};});
+        var end=state.simTime,step=.3,points=[],count=Math.floor(end/step);
+        for(var i=0;i<=count;i++){var t=i*step;points.push({t:t,v:simTemp(c,t,state.trial)});}
+        if(points.length===0||points[points.length-1].t<end-.00001)points.push({t:end,v:simTemp(c,end,state.trial)});
+        return points;
+      }
+      function updateGraph(){
+        var svg=$("graph");while(svg.firstChild)svg.removeChild(svg.firstChild);
+        var W=720,H=340,left=55,right=18,top=18,bottom=43;
+        var cw=W-left-right,ch=H-top-bottom;
+        var plots={};COLORS.forEach(function(c){plots[c]=pointsFor(c);});
+        var vals=[];
+        COLORS.forEach(function(c){plots[c].forEach(function(p){vals.push(state.metric==="absolute"?p.v:p.v-actualT(c,0));});});
+        if(state.mode==="class"&&state.spread&&state.group==="average"){
+          GROUPS.forEach(function(g){COLORS.forEach(function(c){g[c].forEach(function(v,i){vals.push(state.metric==="absolute"?v:v-g[c][0]);});});});
+        }
+        var min=state.metric==="absolute"?Math.max(0,Math.floor((Math.min.apply(null,vals)-5)/10)*10):Math.min(0,Math.floor(Math.min.apply(null,vals)/10)*10);
+        var max=Math.max(min+20,Math.ceil((Math.max.apply(null,vals)+8)/10)*10);
+        var X=function(t){return left+cw*(t/15);};
+        var Y=function(v){return top+ch-(v-min)/(max-min)*ch;};
+        svgEl("rect",{x:left,y:top,width:cw,height:ch,rx:8,fill:"#fbfcff"},svg);
+        for(var i=0;i<=5;i++){
+          var value=min+(max-min)*i/5,y=Y(value);
+          svgEl("line",{x1:left,y1:y,x2:W-right,y2:y,stroke:"#e8edf5","stroke-width":1},svg);
+          var label=svgEl("text",{x:left-10,y:y+4,fill:"#8390a5","font-size":12,"text-anchor":"end"},svg);
+          label.textContent=String(Math.round(value*10)/10);
+        }
+        TIMES.forEach(function(t){
+          var x=X(t);svgEl("line",{x1:x,y1:top,x2:x,y2:H-bottom,stroke:"#f0f2f8","stroke-width":1},svg);
+          var label=svgEl("text",{x:x,y:H-19,fill:"#8390a5","font-size":12,"text-anchor":"middle"},svg);
+          label.textContent=String(t);
+        });
+        var yLabel=svgEl("text",{x:14,y:12,fill:"#6c7790","font-size":12,"font-weight":700},svg);
+        yLabel.textContent=state.metric==="absolute"?"°C":"Δ°C";
+        var xLabel=svgEl("text",{x:W-15,y:H-7,fill:"#6c7790","font-size":12,"text-anchor":"end"},svg);
+        xLabel.textContent="Time (min)";
+        if(state.mode==="class"&&state.spread&&state.group==="average"){
+          COLORS.forEach(function(c){
+            var upper=[],lower=[];
+            TIMES.forEach(function(t,i){
+              var values=GROUPS.map(function(g){return state.metric==="absolute"?g[c][i]:g[c][i]-g[c][0];});
+              upper.push(X(t)+","+Y(Math.max.apply(null,values)));
+              lower.push(X(t)+","+Y(Math.min.apply(null,values)));
+            });
+            svgEl("polygon",{points:upper.concat(lower.reverse()).join(" "),fill:PEN[c],"fill-opacity":.09,stroke:"none"},svg);
+          });
+        }
+        COLORS.forEach(function(c){
+          var pts=plots[c].map(function(p){
+            var v=state.metric==="absolute"?p.v:p.v-actualT(c,0);
+            return X(p.t)+","+Y(v);
+          }).join(" ");
+          svgEl("polyline",{points:pts,fill:"none",stroke:PEN[c],"stroke-width":3.7,"stroke-linejoin":"round","stroke-linecap":"round"},svg);
+          if(state.mode==="class"){
+            plots[c].forEach(function(p){
+              svgEl("circle",{cx:X(p.t),cy:Y(state.metric==="absolute"?p.v:p.v-actualT(c,0)),r:3.8,fill:"#fff",stroke:PEN[c],"stroke-width":2},svg);
+            });
+          }else{
+            TIMES.filter(function(t){return t<=state.simTime+.0001;}).forEach(function(t){
+              var v=state.metric==="absolute"?simTemp(c,t,state.trial):simTemp(c,t,state.trial)-actualT(c,0);
+              svgEl("circle",{cx:X(t),cy:Y(v),r:3.5,fill:"#fff",stroke:PEN[c],"stroke-width":2},svg);
+            });
+          }
+        });
+        var ct=currentTime(),cursorX=X(ct);
+        svgEl("line",{x1:cursorX,y1:top,x2:cursorX,y2:H-bottom,stroke:"#6957e9","stroke-width":1.5,"stroke-dasharray":"4 5","stroke-opacity":.8},svg);
+        var marker=svgEl("text",{x:clamp(cursorX+8,left+3,W-right-60),y:top+15,fill:"#6957e9","font-size":12,"font-weight":750},svg);
+        marker.textContent=ct.toFixed(1)+" min";
+        $("axisDescription").textContent=state.metric==="absolute"?"Y-axis: air temperature (°C)":"Y-axis: temperature change from t = 0 (°C)";
+        $("graphReadout").textContent="Time cursor: "+ct.toFixed(1)+" min";
+      }
+      function render(){
+        updateButtons();updateStage();updateStats();updateGraph();updateTable();
+      }
+      function setMetric(metric){
+        state.metric=metric;
+        $("absoluteBtn").classList.toggle("active",metric==="absolute");
+        $("changeBtn").classList.toggle("active",metric==="change");
+        $("absoluteBtn").setAttribute("aria-pressed",String(metric==="absolute"));
+        $("changeBtn").setAttribute("aria-pressed",String(metric==="change"));
+        render();
+      }
+      function changeSetup(){
+        var justCompleted=state.alreadyCommitted;
+        state.distance=Number($("distance").value);state.power=Number($("power").value);
+        $("distanceValue").textContent=state.distance+" cm";
+        $("powerValue").textContent=state.power+"%";
+        if(justCompleted)state.trial++;
+        restartVirtual(false);
+        $("trialHint").textContent="Lamp settings changed. Reset the current trial before collecting a new comparison.";
+      }
+      function toggleExplore(){
+        state.explore=$("exploreToggle").checked;
+        $("exploreSettings").hidden=!state.explore;
+        $("exploreWarning").hidden=!state.explore;
+        if(!state.explore){$("distance").value="10";$("power").value="100";}
+        changeSetup();
+      }
+      function downloadCsv(){
+        var data=readTimePoints();
+        var source=state.mode==="virtual"?"Virtual trial "+state.trial:(state.group==="average"?"Class mean":"Group "+(Number(state.group)+1));
+        var lines=[["Source","Time (min)","Black (°C)","Grey (°C)","White (°C)"].join(",")];
+        TIMES.forEach(function(t,i){
+          var row=[source,t];COLORS.forEach(function(c){row.push(data[c][i]===null?"":data[c][i].toFixed(2));});
+          lines.push(row.join(","));
+        });
+        var blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+        var url=URL.createObjectURL(blob),link=document.createElement("a");
+        link.href=url;link.download=state.mode==="virtual"?"heat_lab_virtual_trial_"+state.trial+".csv":"heat_lab_"+(state.group==="average"?"class_mean":"group_"+(Number(state.group)+1))+".csv";
+        document.body.appendChild(link);link.click();link.remove();
+        setTimeout(function(){URL.revokeObjectURL(url);},1000);
+      }
+      $("virtualTab").addEventListener("click",function(){setMode("virtual");});
+      $("classTab").addEventListener("click",function(){setMode("class");});
+      $("runBtn").addEventListener("click",startOrPause);
+      $("stageRunBtn").addEventListener("click",startOrPause);
+      $("stepBtn").addEventListener("click",stepVirtual);
+      $("playClassBtn").addEventListener("click",startOrPause);
+      $("newTrialBtn").addEventListener("click",repeatVirtual);
+      $("resetBtn").addEventListener("click",function(){
+        restartVirtual(true);$("trialHint").textContent="All virtual trial history cleared. Begin a fresh run.";
+      });
+      $("speed").addEventListener("change",function(){state.speed=Number(this.value);});
+      $("exploreToggle").addEventListener("change",toggleExplore);
+      $("distance").addEventListener("input",changeSetup);
+      $("power").addEventListener("input",changeSetup);
+      $("groupSelect").addEventListener("change",function(){state.group=this.value;stop();render();});
+      $("spreadToggle").addEventListener("change",function(){state.spread=this.checked;render();});
+      $("timeSlider").addEventListener("input",function(){var chosenTime=Number(this.value);stop();state.classTime=chosenTime;render();});
+      $("absoluteBtn").addEventListener("click",function(){setMetric("absolute");});
+      $("changeBtn").addEventListener("click",function(){setMetric("change");});
+      $("csvBtn").addEventListener("click",downloadCsv);
+      window.heatLabGuideBridge={groups:GROUPS,mean:CLASS_MEAN,pause:function(){stop();render();},read:function(){return {mode:state.mode,data:JSON.parse(JSON.stringify(readTimePoints()))};}};
+      render();
+    })();
+  </script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id), bridge=window.heatLabGuideBridge;
+const colours=['black','grey','white'], names=['Black','Grey','White'], pens=['#28334d','#8792ab','#069caa'], times=[0,3,6,9,12,15];
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let page=1,coolTime=0,coolPlaying=false,coolFrame=0,last=0;
+function showPage(n){page=n;if(n===2){bridge.pause();heating();}else pauseCooling();$('experimentPage').hidden=n!==1;$('guidePage').hidden=n!==2;$('pageOneBtn').setAttribute('aria-current',n===1?'page':'false');$('pageTwoBtn').setAttribute('aria-current',n===2?'page':'false');if(n===1){$('gPanDiagram').classList.add('still');$('gPanToggle').setAttribute('aria-pressed','false');$('gPanToggle').textContent='▶ Animate convection';$('pageOneBtn').focus();}else $('guideTitle').focus();window.scrollTo({top:0,behavior:'instant'});}
+$('pageOneBtn').onclick=()=>showPage(1);$('pageTwoBtn').onclick=()=>showPage(2);$('backExperiment').onclick=$('backExperimentBottom').onclick=()=>showPage(1);
+const controlTexts={distance:'Distance affects the radiant energy arriving at the bottle. Keeping each bottle 10 cm from an equivalent lamp prevents distance, rather than colour, from explaining a different heating rate.',volume:'For the same energy transferred to the air, a larger mass of air needs more energy for the same temperature rise (Q = mcΔT). Keep bottle volume constant; changing size can also change surface area and heat transfer.',material:'Material and wall thickness affect conduction and the energy needed to warm the wall. Use otherwise identical bottles so construction is not an alternative explanation for different heating rates.',probe:'Air can be at different temperatures in different parts of the bottle. Put each thermometer bulb centrally at the same height, without touching the wall, so the readings are comparable.',duration:'Longer exposure supplies energy for longer; a different lamp output changes energy input per second. Use the same timing and equivalent stable lamp output for each colour.'};
+$('gControl').onchange=()=>{$('controlExplanation').textContent=controlTexts[$('gControl').value];};$('gControl').onchange();
+bridge.groups.forEach((g,i)=>{let o=document.createElement('option');o.value=String(i);o.textContent='Class group '+(i+1);$('gSource').append(o);});
+function fit(ts,vs){const pairs=ts.map((t,i)=>[t,vs[i]]).filter(p=>p[1]!==null&&Number.isFinite(p[1]));if(pairs.length<2)return null;const mx=pairs.reduce((a,p)=>a+p[0],0)/pairs.length,my=pairs.reduce((a,p)=>a+p[1],0)/pairs.length;let b=pairs.reduce((a,p)=>a+(p[0]-mx)*(p[1]-my),0)/pairs.reduce((a,p)=>a+(p[0]-mx)**2,0);return {b,a:my-b*mx,end:pairs.at(-1)[0]};}
+function el(tag,attrs,parent,text){const e=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(attrs||{}).forEach(([k,v])=>e.setAttribute(k,v));if(text!==undefined)e.textContent=text;parent.appendChild(e);return e;}
+function chart(id,ts,series,seriesPens,labels,yTitle,options={}){let svg=$(id);svg.replaceChildren();el('title',{},svg,yTitle+' against time');el('desc',{},svg,'Series: '+labels.join(', ')+'. Numerical values are available in the adjacent table.');const l=70,r=25,t=35,b=58,W=760,H=370;let values=series.flat().filter(v=>v!==null&&Number.isFinite(v));const fits=series.map(v=>fit(ts,v));if(options.fit)fits.forEach(f=>{if(f)values.push(f.a,f.a+f.b*f.end);});let lo=values.length?Math.floor((Math.min(...values)-2)/10)*10:0,hi=values.length?Math.ceil((Math.max(...values)+2)/10)*10:50;if(options.change)lo=Math.min(0,lo);if(hi===lo)hi=lo+10;const X=x=>l+(W-l-r)*x/ts.at(-1),Y=y=>H-b-(H-t-b)*(y-lo)/(hi-lo);el('rect',{x:l,y:t,width:W-l-r,height:H-t-b,fill:'#fafbfe',stroke:'#dbe1ec'},svg);for(let i=0;i<=5;i++){let v=lo+(hi-lo)*i/5;el('line',{x1:l,y1:Y(v),x2:W-r,y2:Y(v),stroke:'#e1e6ef'},svg);el('text',{x:l-12,y:Y(v)+4,'text-anchor':'end',fill:'#53617b','font-size':13},svg,Number(v.toFixed(1)));}ts.forEach(v=>el('text',{x:X(v),y:H-b+23,'text-anchor':'middle',fill:'#53617b','font-size':13},svg,v));el('text',{x:l,y:20,fill:'#26324e','font-size':15},svg,yTitle);el('text',{x:(l+W-r)/2,y:H-8,'text-anchor':'middle',fill:'#26324e','font-size':15},svg,'Time (min)');series.forEach((vs,i)=>{let pts=ts.map((x,j)=>({x,y:vs[j]})).filter(p=>p.y!==null&&Number.isFinite(p.y));if(options.join)el('polyline',{points:pts.map(p=>X(p.x)+','+Y(p.y)).join(' '),fill:'none',stroke:seriesPens[i],'stroke-width':3},svg);if(options.fit&&fits[i]){let f=fits[i];el('line',{x1:X(0),y1:Y(f.a),x2:X(f.end),y2:Y(f.a+f.b*f.end),stroke:seriesPens[i],'stroke-width':2.5,'stroke-dasharray':'7 5'},svg);}pts.forEach(p=>{let x=X(p.x),y=Y(p.y),mark=i===0?el('circle',{cx:x,cy:y,r:4.5,fill:seriesPens[i]},svg):i===1?el('rect',{x:x-4,y:y-4,width:8,height:8,fill:seriesPens[i]},svg):el('polygon',{points:`${x},${y-5} ${x-5},${y+4} ${x+5},${y+4}`,fill:seriesPens[i]},svg);el('title',{},mark,labels[i]+': '+p.x+' min, '+p.y.toFixed(2)+' °C');});});if(options.cursor!==undefined)el('line',{x1:X(options.cursor),x2:X(options.cursor),y1:t,y2:H-b,stroke:'#6653f2','stroke-width':2,'stroke-dasharray':'3 4'},svg);}
+function heating(){let source=$('gSource').value,data=source==='mean'?bridge.mean:source==='current'?bridge.read().data:bridge.groups[Number(source)];let change=$('gMetric').value==='change';let s=colours.map(c=>data[c].map(v=>v===null?null:change?v-data[c][0]:v));chart('gHeatingGraph',times,s,pens,names,change?'Temperature change, ΔT (°C)':'Air temperature (°C)',{fit:$('gFit').checked,change});$('gSourceNote').textContent=source==='current'?'Snapshot of Page 1 '+(bridge.read().mode==='virtual'?'simulated readings; these are not class measurements.':'selected class measurements.')+' Only recorded points are included.':'Measured 2026 class data · '+(source==='mean'?'mean of all seven groups.':'Group '+(Number(source)+1)+'.');$('gRates').replaceChildren();colours.forEach((c,i)=>{let v=data[c],end=v.findLastIndex(x=>x!==null),delta=end>0?v[end]-v[0]:null,f=fit(times,v),row=document.createElement('tr');[names[i],delta===null?'—':delta.toFixed(2),delta===null?'—':(delta/times[end]).toFixed(3),f?f.b.toFixed(3):'—'].forEach(x=>{let td=document.createElement('td');td.textContent=x;row.append(td);});$('gRates').append(row);});let v=data.black,end=v.findLastIndex(x=>x!==null),f=fit(times,s[0]);$('gRateExample').textContent=end>0?`Black: (${v[end].toFixed(2)} − ${v[0].toFixed(2)}) ÷ ${times[end]} = ${((v[end]-v[0])/times[end]).toFixed(3)} °C/min over the measured interval.`:'Record at least two times on Page 1 to calculate a rate.';$('gFitExample').textContent=f?`Black fitted line: at 0 min, ${f.a.toFixed(2)} °C; at ${f.end} min, ${(f.a+f.b*f.end).toFixed(2)} °C. Gradient ≈ ${f.b.toFixed(3)} °C/min. ${change?'These vertical values are temperature changes, not absolute temperatures.':''}`:'A fitted line needs at least two recorded points.';}
+['gSource','gMetric','gFit'].forEach(id=>$(id).onchange=heating);
+let slopes=colours.map(c=>fit(times,bridge.mean[c]).b.toFixed(2));$('gConclusionText').textContent=`The class-mean graph supports the hypothesis that black model cars warm faster than white ones under equivalent illumination. All three colours warmed over 15 minutes; black showed the steepest overall trend, grey was intermediate and white the shallowest. The straight best-fit gradients were approximately ${slopes[0]} °C/min for black, ${slopes[1]} °C/min for grey and ${slopes[2]} °C/min for white. These graph-derived rates support the colour ranking. Under these lamp conditions the black surface absorbs more of the incident radiation, while white reflects more. Energy passes through the bottle wall and warms the air inside. The result supports the hypothesis for these model bottles, but differences between groups and the simplifications of the model limit claims about real cars.`;
+const transfer={all:'Radiation carries energy from the lamp; conduction transfers it through the wall; convection redistributes it through the air.',radiation:'Radiation: visible and infrared electromagnetic waves travel from the lamp to the bottle. Energy absorbed by the surface warms it. A material medium is not required.',conduction:'Conduction: energy transfers through the solid wall from hotter to cooler regions through particle interactions. The solid wall does not circulate.',convection:'Convection: warmed air expands, becomes less dense and rises. Cooler, denser air sinks, producing circulation. Air near the wall is first warmed by conduction.'};document.querySelectorAll('[data-transfer]').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('[data-transfer]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));document.querySelectorAll('[data-part]').forEach(p=>p.classList.toggle('muted-part',btn.dataset.transfer!=='all'&&p.dataset.part!==btn.dataset.transfer));$('gTransferText').textContent=transfer[btn.dataset.transfer];});
+$('gMotion').onclick=()=>{let paused=$('gTransferDiagram').classList.toggle('still');$('gMotion').textContent=paused?'Resume diagram motion':'Pause diagram motion';$('gMotion').setAttribute('aria-pressed',String(paused));};if(reduced){$('gTransferDiagram').classList.add('still');$('gMotion').textContent='Motion reduced by device preference';$('gMotion').disabled=true;}
+const ct=[0,15,30,45,60],cv=[[80,72,65,59,54],[80,76,72,68,64],[80,79,78,77,76]];
+function cooling(){let i=Math.min(3,Math.floor(coolTime/15)),p=(coolTime-ct[i])/15;$('gCoolTime').textContent=coolTime.toFixed(1)+' min';$('gCoolSlider').value=coolTime;cv.forEach((vs,j)=>{let temp=vs[i]+(vs[i+1]-vs[i])*p;$('gV'+j).textContent=temp.toFixed(1)+' °C';$('gV'+j).style.background=`rgb(${Math.round(228+(temp-54)/26*27)},${Math.round(237-(temp-54)/26*27)},${Math.round(250-(temp-54)/26*95)})`;$('gLoss'+j).style.width=((80-temp)/30*100)+'%';$('gDrop'+j).textContent='Drop: '+(80-temp).toFixed(1)+' °C';});chart('gCoolGraph',ct,cv,['#b94a27','#23799b','#6653f2'],['Plastic','Steel','Flask'],'Water temperature (°C)',{join:true,cursor:coolTime});}
+function pauseCooling(){coolPlaying=false;cancelAnimationFrame(coolFrame);$('gCoolPlay').textContent=coolTime>=60?'↻ Replay heat loss':'▶ Play heat loss';$('gVessels').classList.add('still');}
+function tick(now){if(!coolPlaying)return;coolTime=Math.min(60,coolTime+Math.min(.2,(now-last)/1000)*5);last=now;cooling();if(coolTime>=60)pauseCooling();else coolFrame=requestAnimationFrame(tick);}
+$('gCoolPlay').onclick=()=>{if(coolPlaying){pauseCooling();return;}if(coolTime>=60)coolTime=0;coolPlaying=true;last=performance.now();$('gVessels').classList.remove('still');$('gCoolPlay').textContent='❚❚ Pause heat loss';coolFrame=requestAnimationFrame(tick);};$('gCoolNext').onclick=()=>{pauseCooling();coolTime=Math.min(60,(Math.floor(coolTime/15)+1)*15);cooling();};$('gCoolReset').onclick=()=>{pauseCooling();coolTime=0;cooling();};$('gCoolSlider').oninput=()=>{pauseCooling();coolTime=Number($('gCoolSlider').value);cooling();};
+function shirt(black){$('gBlackShirt').setAttribute('aria-pressed',String(black));$('gWhiteShirt').setAttribute('aria-pressed',String(!black));$('gShirt').setAttribute('fill',black?'#28334d':'#fff');$('gShirtReflect').setAttribute('opacity',black?'.25':'1');$('gShirtText').textContent=black?'Black fabric generally absorbs more incoming sunlight, increasing the energy available to warm the fabric and wearer.':'White fabric generally reflects more incoming sunlight, leaving less energy to warm otherwise similar fabric and the wearer.';}$('gBlackShirt').onclick=()=>shirt(true);$('gWhiteShirt').onclick=()=>shirt(false);
+$('gPanToggle').onclick=()=>{let still=$('gPanDiagram').classList.toggle('still');$('gPanToggle').setAttribute('aria-pressed',String(!still));$('gPanToggle').textContent=still?'▶ Animate convection':'❚❚ Pause convection';};if(reduced){$('gPanToggle').disabled=true;$('gPanToggle').textContent='Static arrows · reduced motion enabled';}pauseCooling();cooling();heating();shirt(true);
+})();
+
+(function(){
+'use strict';
+const $=id=>document.getElementById(id), reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const scenes=Array.from(document.querySelectorAll('.motion-scene')).map(node=>({node,phase:0,speed:1}));
+const transfer=scenes.find(s=>s.node.id==='gTransferDiagram'),pan=scenes.find(s=>s.node.id==='gPanDiagram'),shirt=scenes.find(s=>s.node.id==='gShirtDiagram');
+function svgEl(name,attrs,parent){const n=document.createElementNS('http://www.w3.org/2000/svg',name);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));parent.append(n);return n;}
+const lattice=[];for(let row=0;row<3;row++)for(let col=0;col<6;col++){const x=43+col*42,y=93+row*47;svgEl('circle',{cx:x,cy:y,r:15,fill:'none',stroke:'#c5cfdd','stroke-width':1},$('gLattice'));let dot=svgEl('circle',{cx:x,cy:y,r:10,fill:'#b6502b',stroke:'white','stroke-width':2},$('gLattice'));lattice.push({dot,x,y,col,row});}
+const steps=[['1 · Warm and rise','Near the heated base, water expands. It becomes less dense than nearby water and rises.'],['2 · Spread near the surface','The rising water moves outward near the surface. It transfers energy to cooler surroundings and begins to cool.'],['3 · Cool and sink','Cooler water is denser than the warmer water beside it, so it sinks down the side.'],['4 · Return to the heat','Water flows along the base to replace the rising water. It warms again and the loop continues.']];let previousStage=-1;
+function thermal(p){if(p<.32)return '#c25225';if(p<.55){let f=(p-.32)/.23;return `rgb(${Math.round(194*(1-f)+8*f)},${Math.round(82*(1-f)+123*f)},${Math.round(37*(1-f)+156*f)})`;}return '#087b9c';}
+function paint(s){s.node.querySelectorAll('[data-route]').forEach(dot=>{const path=$(dot.dataset.route),f=(s.phase+Number(dot.dataset.offset||0))%1,pt=path.getPointAtLength(path.getTotalLength()*f);dot.setAttribute('transform',`translate(${pt.x.toFixed(2)} ${pt.y.toFixed(2)})`);if(dot.dataset.thermal)dot.querySelector('circle').setAttribute('fill',thermal(f));});if(s===transfer)lattice.forEach(({dot,x,y,col,row})=>{const wave=(s.phase*4-col*.13+row*.03)*Math.PI*2;dot.setAttribute('cx',x+Math.sin(wave)*(4.3-col*.4));dot.setAttribute('cy',y+Math.cos(wave)*1.7);dot.setAttribute('fill',`rgb(${Math.round(180+55*(Math.sin(wave)+1)/2)},${90+col*12},${45+col*22})`);});if(s===pan){let k=s.phase<.28?0:s.phase<.5?1:s.phase<.8?2:3;if(k!==previousStage){$('gPanStage').textContent=steps[k][0];$('gPanExplain').textContent=steps[k][1];document.querySelectorAll('[data-pan-phase]').forEach((btn,i)=>btn.setAttribute('aria-pressed',String(k===i)));previousStage=k;}}}
+function freeze(s){s.node.classList.add('still');if(s===pan){$('gPanToggle').textContent=reduced?'Static arrows · reduced motion enabled':'▶ Animate convection';$('gPanToggle').setAttribute('aria-pressed','false');}if(s===transfer&&!reduced){$('gMotion').textContent='Resume diagram motion';$('gMotion').setAttribute('aria-pressed','true');}}
+$('gTransferStep').onclick=()=>{freeze(transfer);transfer.phase=(transfer.phase+.08)%1;paint(transfer);};$('gMotionSpeed').onchange=()=>{transfer.speed=Number($('gMotionSpeed').value);};$('gPanSpeed').onchange=()=>{pan.speed=Number($('gPanSpeed').value);};$('gPanStep').onclick=()=>{freeze(pan);pan.phase=(pan.phase+.08)%1;paint(pan);};document.querySelectorAll('[data-pan-phase]').forEach(btn=>btn.onclick=()=>{freeze(pan);pan.phase=Number(btn.dataset.panPhase);paint(pan);});
+$('gShirtPause').onclick=()=>{const paused=shirt.node.classList.toggle('still');$('gShirtPause').setAttribute('aria-pressed',String(paused));$('gShirtPause').textContent=paused?'Resume sunlight motion':'Pause sunlight motion';};if(reduced){scenes.forEach(s=>s.node.classList.add('still'));$('gShirtPause').disabled=true;$('gShirtPause').textContent='Static sunlight · reduced motion';}
+function shirtLabels(){const black=$('gBlackShirt').getAttribute('aria-pressed')==='true';$('gAbsorbLabel').textContent=black?'More absorbed':'Less absorbed';$('gReflectedMarker').setAttribute('opacity',black?'.25':'1');}$('gBlackShirt').addEventListener('click',shirtLabels);$('gWhiteShirt').addEventListener('click',shirtLabels);shirtLabels();
+scenes.forEach(paint);let last=performance.now();function tick(now){let dt=Math.min(.06,(now-last)/1000);last=now;if(!document.hidden&&!$('guidePage').hidden){scenes.forEach(s=>{if(!s.node.classList.contains('still')&&!reduced){const r=s.node.getBoundingClientRect();if(r.bottom>=0&&r.top<=innerHeight){s.phase=(s.phase+dt*s.speed/(s===shirt?3:10))%1;paint(s);}}});}requestAnimationFrame(tick);}requestAnimationFrame(tick);
+})();
+
+</script>
+</body>
+</html>
